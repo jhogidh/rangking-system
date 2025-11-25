@@ -3,99 +3,118 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Kriteria; // <-- Ganti ke model Kriteria
+use App\Models\Kriteria;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule; // <-- Import Rule untuk validasi unique
+use Illuminate\Validation\Rule;
 
 class KriteriaController extends Controller
 {
-    /**
-     * Menampilkan halaman utama (tabel data kriteria)
-     */
     public function index()
     {
-        $kriteria = Kriteria::latest()->paginate(10);
-
-        // Kirim data ke view
+        // Urutkan berdasarkan prioritas (1, 2, 3...)
+        $kriteria = Kriteria::orderBy('prioritas', 'asc')->paginate(10);
         return view('layouts.admin.contents.kriteria.index', compact('kriteria'));
     }
 
-    /**
-     * Menampilkan halaman form tambah data
-     */
     public function create()
     {
         return view('layouts.admin.contents.kriteria.create');
     }
 
-    /**
-     * Menyimpan data kriteria baru ke database
-     */
     public function store(Request $request)
     {
-        // 1. Validasi data
         $request->validate([
             'nama_kriteria' => 'required|string|unique:kriteria,nama_kriteria|max:255',
-            'bobot' => 'required|numeric|min:0|max:1', // Bobot biasanya antara 0 dan 1
+            // Validasi prioritas harus angka & unik
+            'prioritas' => 'required|integer|min:1|unique:kriteria,prioritas',
         ]);
 
-        // 2. Simpan data
+        // Simpan prioritas saja, bobot biarkan 0 dulu
         Kriteria::create([
             'nama_kriteria' => $request->nama_kriteria,
-            'bobot' => $request->bobot,
+            'prioritas' => $request->prioritas,
+            'bobot' => 0,
         ]);
 
-        // 3. Redirect kembali ke halaman index
         return redirect()->route('admin.kriteria.index')
-            ->with('success', 'Data kriteria berhasil ditambahkan.');
+            ->with('success', 'Kriteria ditambahkan. Jangan lupa klik "Hitung Bobot ROC"!');
     }
 
-    /**
-     * Menampilkan halaman form edit data
-     */
     public function edit(Kriteria $kriteria)
     {
-        // kirim data kriteria yang ditemukan ke view
         return view('layouts.admin.contents.kriteria.edit', compact('kriteria'));
     }
 
-    /**
-     * Mengupdate data kriteria di database
-     */
     public function update(Request $request, Kriteria $kriteria)
     {
-        // 1. Validasi data
         $request->validate([
             'nama_kriteria' => [
                 'required',
                 'string',
-                Rule::unique('kriteria')->ignore($kriteria->id), // Ignore ID ini
-                'max:255'
+                'max:255',
+                Rule::unique('kriteria')->ignore($kriteria->id),
             ],
-            'bobot' => 'required|numeric|min:0|max:1',
+            'prioritas' => [
+                'required',
+                'integer',
+                'min:1',
+                Rule::unique('kriteria')->ignore($kriteria->id),
+            ],
         ]);
 
-        // 2. Update data
         $kriteria->update([
             'nama_kriteria' => $request->nama_kriteria,
-            'bobot' => $request->bobot,
+            'prioritas' => $request->prioritas,
+            // Bobot tidak diupdate manual, tetap pakai nilai lama sampai dihitung ulang
         ]);
 
-        // 3. Redirect kembali ke halaman index
         return redirect()->route('admin.kriteria.index')
-            ->with('success', 'Data kriteria berhasil diperbarui.');
+            ->with('success', 'Data kriteria diperbarui. Silakan hitung ulang bobot.');
+    }
+
+    public function destroy(Kriteria $kriteria)
+    {
+        $kriteria->delete();
+        return redirect()->route('admin.kriteria.index')
+            ->with('success', 'Data kriteria dihapus. Silakan hitung ulang bobot.');
     }
 
     /**
-     * Menghapus data kriteria dari database
+     * Logic inti perhitungan ROC
      */
-    public function destroy(Kriteria $kriteria)
+    public function hitungBobot()
     {
-        // Hapus data
-        $kriteria->delete();
+        // 1. Ambil semua kriteria diurutkan prioritas 1 sampai akhir
+        $semuaKriteria = Kriteria::orderBy('prioritas', 'asc')->get();
+        $totalKriteria = $semuaKriteria->count();
 
-        // Redirect kembali
+        if ($totalKriteria == 0) {
+            return back()->with('error', 'Belum ada data kriteria.');
+        }
+
+        // 2. Loop untuk menghitung bobot tiap kriteria
+        // Rumus ROC: W_k = (1/K) * Sum(1/i) dari i=k sampai K
+
+        foreach ($semuaKriteria as $index => $kriteria) {
+            // $index dimulai dari 0, tapi prioritas ranking (k) dimulai dari 1
+            // Sebenarnya $kriteria->prioritas sudah ada, tapi lebih aman pakai loop index + 1
+            // untuk memastikan urutan 1, 2, 3... teratur saat perhitungan matematikanya.
+
+            $rank = $index + 1; // Ini adalah 'k'
+            $sigma = 0;
+
+            // Loop Sigma (Sum)
+            for ($i = $rank; $i <= $totalKriteria; $i++) {
+                $sigma += (1 / $i);
+            }
+
+            $bobotRoc = $sigma / $totalKriteria;
+
+            // 3. Update bobot ke database
+            $kriteria->update(['bobot' => $bobotRoc]);
+        }
+
         return redirect()->route('admin.kriteria.index')
-            ->with('success', 'Data kriteria berhasil dihapus.');
+            ->with('success', 'Bobot berhasil dihitung ulang menggunakan metode ROC!');
     }
 }

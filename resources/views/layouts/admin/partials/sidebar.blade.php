@@ -52,37 +52,45 @@
             </div>
         </li>
 
-        <!-- === ALUR 4 MENU SPK KAMU === -->
+        <!-- === ALUR 5 MENU SPK (DIPERBARUI) === -->
 
-        <!-- Menu 1 (dari 4): Bobot ROC -->
+        <!-- 1. Hitung Manual (SAW) - SEBELUM ROC -->
+        <li class="nav-item">
+            <a class="nav-link" href="{{ route('admin.manual.index') }}">
+                <i class="icon-paper menu-icon"></i>
+                <span class="menu-title">1. Hitung Manual (SAW)</span>
+            </a>
+        </li>
+
+        <!-- 2. Bobot ROC -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.kriteria.index') }}">
-                <i class="icon-calculator menu-icon"></i>
-                <span class="menu-title">1. Bobot Kriteria (ROC)</span>
+                <i class="icon-paper menu-icon"></i>
+                <span class="menu-title">2. Bobot Kriteria (ROC)</span>
             </a>
         </li>
 
-        <!-- Menu 2 (dari 4): Hitung Borda -->
+        <!-- 3. Hitung Borda -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.borda.index') }}">
-                <i class="icon-graph menu-icon"></i>
-                <span class="menu-title">2. Hitung Borda</span>
+                <i class="icon-paper menu-icon"></i>
+                <span class="menu-title">3. Hitung Borda</span>
             </a>
         </li>
 
-        <!-- Menu 3 (dari 4): Hitung WP -->
+        <!-- 4. Hitung WP -->
         <li class="nav-item">
             <a class="nav-link" href="{{ route('admin.wp.index') }}">
-                <i class="icon-graph menu-icon"></i>
-                <span class="menu-title">3. Hitung WP</span>
+                <i class="icon-paper menu-icon"></i>
+                <span class="menu-title">4. Hitung WP</span>
             </a>
         </li>
 
-        <!-- Menu 4 (dari 4): Laporan Analisis -->
+        <!-- 5. Laporan Analisis -->
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#laporan" aria-expanded="false" aria-controls="laporan">
-                <i class="icon-pie-chart menu-icon"></i>
-                <span class="menu-title">4. Laporan Analisis</span>
+                <i class="icon-paper menu-icon"></i>
+                <span class="menu-title">5. Laporan Analisis</span>
                 <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="laporan">

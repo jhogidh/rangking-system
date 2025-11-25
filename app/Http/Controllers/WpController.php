@@ -34,7 +34,9 @@ class WpController extends Controller
         $id_semester = $request->id_semester;
         $id_kelas = $request->id_kelas;
 
+        // Ambil semua kriteria dari database
         $allCriteria = Kriteria::all();
+
         $query = DataSiswaKelas::where('id_semester', $id_semester)->with(['nilaiKriteria', 'siswa']);
 
         if ($id_kelas) {
@@ -48,24 +50,47 @@ class WpController extends Controller
         }
 
         $alternatives = [];
-        $usedCriteriaIds = [];
         $siswaMap = []; // Untuk mapping ID ke Nama
 
         foreach ($dataSiswaSemester as $siswa) {
             $nilaiMap = $siswa->nilaiKriteria->pluck('nilai', 'id_kriteria');
+
+            // Skip jika siswa belum punya nilai sama sekali
             if ($nilaiMap->isEmpty()) continue;
 
             $alternatives[$siswa->id] = $nilaiMap;
             // Pastikan relasi 'siswa' ada untuk mengambil nama
             $siswaMap[$siswa->id] = $siswa->siswa->nama ?? 'Siswa ID: ' . $siswa->id;
-            $usedCriteriaIds = array_merge($usedCriteriaIds, $nilaiMap->keys()->all());
         }
 
         if (empty($alternatives)) {
             return redirect()->back()->with('error', 'Siswa ditemukan, tapi data nilai kriteria (hasil import) masih kosong.');
         }
 
-        $criteria = $allCriteria->whereIn('id', array_unique($usedCriteriaIds));
+        // 1. Ambil SEMUA kriteria dan urutkan prioritas
+        $criteria = $allCriteria->sortBy('prioritas');
+
+        // === PERBAIKAN LOGIKA SANITASI DATA (FIX NILAI 0) ===
+        // Masalah: WP menggunakan perkalian. Jika ada satu nilai 0/null (misal Ekstra), hasil akhir jadi 0.
+        // Solusi: Loop semua siswa, cek setiap kriteria. Jika kosong/0, isi dengan 1.
+
+        $criteriaIds = $criteria->pluck('id')->toArray();
+
+        foreach ($alternatives as $idSiswa => $nilai) {
+            // Konversi Collection ke array agar bisa dicek & diedit
+            $nilaiArray = $nilai instanceof \Illuminate\Support\Collection ? $nilai->toArray() : $nilai;
+
+            foreach ($criteriaIds as $idKriteria) {
+                // Cek apakah kriteria ini ada nilainya di siswa tersebut?
+                // Jika TIDAK ADA atau nilainya <= 0, ganti jadi 1.
+                if (!array_key_exists($idKriteria, $nilaiArray) || $nilaiArray[$idKriteria] <= 0) {
+                    $nilaiArray[$idKriteria] = 1; // 1 adalah angka aman untuk perkalian (neutral value)
+                }
+            }
+
+            // Update data siswa dengan nilai yang sudah disanitasi
+            $alternatives[$idSiswa] = $nilaiArray;
+        }
 
         return [
             'alternatives' => $alternatives,
@@ -78,14 +103,12 @@ class WpController extends Controller
 
     /**
      * Menampilkan halaman form pemicu WP (Menu 3 - Index)
-     * FUNGSI INI YANG TADI HILANG/UNDEFINED
      */
     public function index()
     {
         $semesters = Semester::with('tahunAjaran')->orderBy('id', 'desc')->get();
         $kelasList = Kelas::orderBy('nama', 'asc')->get();
 
-        // Pastikan view ini ada di resources/views/layouts/admin/contents/wp/index.blade.php
         return view('layouts.admin.contents.wp.index', compact('semesters', 'kelasList'));
     }
 
@@ -102,16 +125,19 @@ class WpController extends Controller
         }
 
         // 1. Jalankan Service WP
+        // Service akan menggunakan $data['criteria'] yang sudah urut Prioritas
         $wpResult = $this->wpService->calculate($data['alternatives'], $data['criteria']);
 
         // 2. Simpan hasil ranking (untuk Laporan Menu 4)
         // Hapus ranking lama untuk siswa yang dihitung saat ini saja
         $processedSiswaIds = array_keys($data['alternatives']);
+
         Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)
             ->where('metode', 'WP')
             ->delete();
 
         $rank = 1;
+        // vector_v adalah hasil akhir preferensi WP
         foreach ($wpResult['steps']['vector_v'] as $id_data_siswa_kelas => $nilai_alternatif) {
             Ranking::create([
                 'id_data_siswa_kelas' => $id_data_siswa_kelas,
@@ -134,7 +160,7 @@ class WpController extends Controller
                 'waktu_tahap_3' => $wpResult['timings']['tahap_3'] ?? 0,
                 'waktu_tahap_4' => $wpResult['timings']['tahap_4'] ?? 0,
                 'waktu_total' => $wpResult['timings']['total'] ?? 0,
-                // Spearman dihitung di AnalisisController, biarkan null/abaikan
+                // Kolom waktu_tahap_5 kosong karena WP biasanya cuma sampai tahap 4 (Perangkingan V)
             ]
         );
 

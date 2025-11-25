@@ -7,9 +7,8 @@
                 <div class="card-body">
                     <h4 class="card-title">Edit Data Kriteria</h4>
                     <p class="card-description">
-                        Ubah data kriteria di bawah ini.
+                        Ubah prioritas atau nama kriteria di bawah ini.
                     </p>
-
 
                     <form class="forms-sample" action="{{ route('admin.kriteria.update', $kriteria->id) }}" method="POST">
                         @csrf
@@ -29,14 +28,17 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="bobot">Bobot</label>
+                            <label for="prioritas">Prioritas (Ranking)</label>
+                            <input type="number" class="form-control @error('prioritas') is-invalid @enderror"
+                                id="prioritas" name="prioritas" placeholder="Contoh: 1"
+                                value="{{ old('prioritas', $kriteria->prioritas) }}" required min="1">
 
-                            <input type="number" class="form-control @error('bobot') is-invalid @enderror" id="bobot"
-                                name="bobot" placeholder="Contoh: 0.25" value="{{ old('bobot', $kriteria->bobot) }}"
-                                required step="0.01" min="0" max="1">
-                            <small class="form-text text-muted">Masukkan angka desimal antara 0 dan 1 (contoh:
-                                0.45).</small>
-                            @error('bobot')
+                            <small class="form-text text-muted">
+                                Ubah angka prioritas jika tingkat kepentingan kriteria berubah.
+                                (1 = Paling Penting).
+                            </small>
+
+                            @error('prioritas')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -45,7 +47,7 @@
 
                         <button type="submit" class="btn btn-primary mr-2">Update</button>
                         <a href="{{ route('admin.kriteria.index') }}" class="btn btn-light">
-                            Cancel
+                            Batal
                         </a>
                     </form>
                 </div>

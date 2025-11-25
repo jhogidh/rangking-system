@@ -7,13 +7,6 @@ use Illuminate\Support\Collection;
 
 class ManualService
 {
-    /**
-     * Menjalankan perhitungan "Manual" (SAW Sederhana).
-     *
-     * @param array $alternatives Data alternatif [id_siswa_kelas => [id_kriteria => nilai]]
-     * @param Collection $criteria Koleksi model Kriteria
-     * @return array
-     */
     public function calculate(array $alternatives, Collection $criteria): array
     {
         $timer = new TimerService();
@@ -24,7 +17,8 @@ class ManualService
         foreach ($alternatives as $altId => $values) {
             $totalNilai = 0;
             foreach ($criteria as $c) {
-                // Ini menjumlahkan nilai asli, bukan bobot
+                // Penjumlahan sederhana (SAW tanpa bobot, atau dengan bobot 1)
+                // Sesuai request awal: "menjumlahkan nilai setiap kriteria"
                 $totalNilai += $values[$c->id] ?? 0;
             }
             $finalScores[$altId] = $totalNilai;
@@ -40,7 +34,10 @@ class ManualService
         $timings['total'] = $timer->getTotalTime();
 
         return [
-            'values' => $finalScores, // [id_siswa_kelas => total_nilai]
+            'steps' => [
+                'final_scores' => $finalScores // Masukkan ke dalam 'steps' agar seragam
+            ],
+            'values' => $finalScores, // Tetap kirim ini untuk backward compatibility jika perlu
             'timings' => $timings,
         ];
     }

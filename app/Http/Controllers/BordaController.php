@@ -59,7 +59,8 @@ class BordaController extends Controller
 
         if (empty($alternatives)) return redirect()->back()->with('error', 'Siswa ditemukan, tapi data nilai kriteria (hasil import) masih kosong.');
 
-        $criteria = $allCriteria->whereIn('id', array_unique($usedCriteriaIds));
+        // Ambil semua kriteria tanpa filter, urutkan sesuai prioritas yang baru kita buat
+        $criteria = $allCriteria->sortBy('prioritas');
 
         return [
             'alternatives' => $alternatives,

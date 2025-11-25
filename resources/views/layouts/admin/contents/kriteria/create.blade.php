@@ -13,7 +13,6 @@
                     <form class="forms-sample" action="{{ route('admin.kriteria.store') }}" method="POST">
                         @csrf
 
-                        <!-- Field 'Nama Kriteria' -->
                         <div class="form-group">
                             <label for="nama_kriteria">Nama Kriteria</label>
                             <input type="text" class="form-control @error('nama_kriteria') is-invalid @enderror"
@@ -26,24 +25,29 @@
                             @enderror
                         </div>
 
-                        <!-- Field 'Bobot' -->
                         <div class="form-group">
-                            <label for="bobot">Bobot</label>
-                            <input type="number" class="form-control @error('bobot') is-invalid @enderror" id="bobot"
-                                name="bobot" placeholder="Contoh: 0.25" value="{{ old('bobot') }}" required
-                                step="0.01" min="0" max="1">
-                            <small class="form-text text-muted">Masukkan angka desimal antara 0 dan 1 (contoh:
-                                0.45).</small>
-                            @error('bobot')
+                            <label for="prioritas">Prioritas (Ranking)</label>
+                            <input type="number" class="form-control @error('prioritas') is-invalid @enderror"
+                                id="prioritas" name="prioritas" placeholder="Contoh: 1" value="{{ old('prioritas') }}"
+                                required min="1">
+
+                            <small class="form-text text-muted">
+                                Tentukan urutan prioritas kriteria.
+                                <strong>Angka 1</strong> adalah kriteria paling penting, <strong>2</strong> terpenting
+                                kedua, dst.
+                                <br><span class="text-danger">*Angka prioritas tidak boleh sama dengan kriteria lain.</span>
+                            </small>
+
+                            @error('prioritas')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
+                        <button type="submit" class="btn btn-primary mr-2">Simpan</button>
                         <a href="{{ route('admin.kriteria.index') }}" class="btn btn-light">
-                            Cancel
+                            Batal
                         </a>
                     </form>
                 </div>

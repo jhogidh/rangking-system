@@ -55,14 +55,13 @@
                 $table->timestamps();
             });
 
-            // 7. kriteria
             Schema::create('kriteria', function (Blueprint $table) {
                 $table->id();
                 $table->string('nama_kriteria');
-                $table->double('bobot')->default(0);
+                $table->integer('prioritas')->unique(); // Tambah ini: Prioritas harus unik (1,2,3)
+                $table->double('bobot')->default(0);    // Bobot biarkan default 0 dulu
                 $table->timestamps();
             });
-
             // === BAGIAN 2: DATA RELASI (Dependen) ===
 
             // 6. semester (Tergantung 'tahun_ajaran')

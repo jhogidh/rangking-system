@@ -2,6 +2,7 @@
 
 // Controller Bawaan
 
+use App\Http\Controllers\ManualController;
 use App\Http\Controllers\AkademikController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -57,7 +58,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('siswa', SiswaController::class);
         Route::resource('kelas', KelasController::class);
         // Menu 1: Perhitungan ROC (Bobot)
-        Route::resource('kriteria', KriteriaController::class);
+        Route::resource('kriteria', KriteriaController::class)->parameters([
+            'kriteria' => 'kriteria' // Memaksa parameter tetap bernama 'kriteria', bukan 'kriterium'
+        ]);
+        Route::post('kriteria/hitung-bobot', [KriteriaController::class, 'hitungBobot'])->name('kriteria.hitung');
         Route::resource('tahun-ajaran', TahunAjaranController::class);
         Route::resource('semester', SemesterController::class);
         Route::resource('akademik', AkademikController::class);
@@ -90,6 +94,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Menu 3: Hitung WP (Beserta Step)
         Route::get('hitung-wp', [WpController::class, 'index'])->name('wp.index');
         Route::post('hitung-wp', [WpController::class, 'calculate'])->name('wp.calculate');
+
+        // Menu 4: Hitung Manual (BARU)
+        Route::get('hitung-manual', [ManualController::class, 'index'])->name('manual.index');
+        Route::post('hitung-manual', [ManualController::class, 'calculate'])->name('manual.calculate');
 
         // Menu 4: Perangkingan (Analisis Total)
         // (Menampilkan perbandingan ranking)
