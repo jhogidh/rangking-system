@@ -9,7 +9,7 @@
                     <p class="card-description">
                         Berikut adalah daftar <code>kelas</code> yang terdaftar di sistem.
                     </p>
-                    <a href="{{ route('admin.kelas.create') }}" class="btn btn-info btn-sm mb-3">
+                    <a href="{{ route('proses.kelas.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Kelas Baru
                     </a>
 
@@ -31,8 +31,8 @@
                             </thead>
                             <tbody>
                                 <!--
-                                      Loop data $kelas dari controller.
-                                    -->
+                                          Loop data $kelas dari controller.
+                                        -->
                                 @forelse($kelas as $key => $k)
                                     <tr>
                                         <td>{{ $kelas->firstItem() + $key }}</td>

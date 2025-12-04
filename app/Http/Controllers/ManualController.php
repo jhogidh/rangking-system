@@ -21,9 +21,9 @@ class ManualController extends Controller
         $this->manualService = $manual;
     }
 
+    // Helper untuk mengambil data dari DataNilaiKriteria (hasil import)
     private function prepareData(Request $request)
     {
-        // (Logika prepareData ini SAMA PERSIS dengan WP dan Borda)
         $request->validate([
             'id_semester' => 'required|exists:semester,id',
             'id_kelas' => 'nullable|exists:kelas,id',
@@ -67,19 +67,13 @@ class ManualController extends Controller
         ];
     }
 
-    /**
-     * Tampilkan Form (Index)
-     */
     public function index()
     {
-        $semesters = Semester::with('tahunAjaran')->orderBy('id', 'desc')->get();
+        $semesters = Semester::orderBy('id', 'desc')->get();
         $kelasList = Kelas::orderBy('nama', 'asc')->get();
         return view('layouts.admin.contents.manual.index', compact('semesters', 'kelasList'));
     }
 
-    /**
-     * Hitung Manual
-     */
     public function calculate(Request $request)
     {
         $data = $this->prepareData($request);
@@ -93,15 +87,8 @@ class ManualController extends Controller
         Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)->where('metode', 'Manual')->delete();
 
         $rank = 1;
-        // Perhatikan: ManualService mengembalikan 'steps' -> 'final_scores' (bukan vector_v)
-        // Kita harus pastikan ManualService konsisten dengan BordaService di bagian return array-nya.
-        // Asumsi: ManualService mengembalikan struktur ['steps' => ['final_scores' => ...], 'timings' => ...]
-        // Jika ManualService-mu belum di-update seperti Borda/WP, kita perlu update juga.
-
-        // Cek ManualService, biasanya 'values' jika belum diupdate menjadi 'steps'
-        // Mari kita asumsikan ManualService juga kita update agar seragam.
-
-        $scores = $manualResult['steps']['final_scores'] ?? $manualResult['values'];
+        // Ambil skor akhir dari 'steps' -> 'final_scores'
+        $scores = $manualResult['steps']['final_scores'];
 
         foreach ($scores as $id_data_siswa_kelas => $nilai_alternatif) {
             Ranking::create([
@@ -113,19 +100,23 @@ class ManualController extends Controller
         }
 
         // 3. Simpan Statistik
-        AnalisisPerbandingan::updateOrCreate(
-            ['id_semester' => $data['id_semester'], 'id_kelas' => $data['id_kelas'], 'metode' => 'Manual'],
-            [
-                'waktu_tahap_1' => $manualResult['timings']['tahap_1'] ?? 0,
-                'waktu_tahap_2' => $manualResult['timings']['tahap_2'] ?? 0,
-                'waktu_total' => $manualResult['timings']['total'] ?? 0,
-                'spearman_rho' => 1.00
-            ]
-        );
+        $queryStat = AnalisisPerbandingan::where('id_semester', $data['id_semester'])->where('metode', 'Manual');
+        if ($data['id_kelas']) $queryStat->where('id_kelas', $data['id_kelas']);
+        else $queryStat->whereNull('id_kelas');
+        $queryStat->delete();
 
-        // 4. Tampilkan View Hasil (Sederhana saja, karena Manual cuma penjumlahan)
+        AnalisisPerbandingan::create([
+            'id_semester' => $data['id_semester'],
+            'id_kelas' => $data['id_kelas'],
+            'metode' => 'Manual',
+            'waktu_tahap_1' => $manualResult['timings']['tahap_1'] ?? 0,
+            'waktu_tahap_2' => $manualResult['timings']['tahap_2'] ?? 0,
+            'waktu_total' => $manualResult['timings']['total'] ?? 0,
+            'spearman_rho' => 1.00
+        ]);
+
         return view('layouts.admin.contents.manual.show-steps', [
-            'steps' => $manualResult['steps'] ?? ['final_scores' => $manualResult['values']],
+            'steps' => $manualResult['steps'],
             'timings' => $manualResult['timings'],
             'criteria' => $data['criteria'],
             'siswaMap' => $data['siswaMap'],

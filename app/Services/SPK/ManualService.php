@@ -17,8 +17,6 @@ class ManualService
         foreach ($alternatives as $altId => $values) {
             $totalNilai = 0;
             foreach ($criteria as $c) {
-                // Penjumlahan sederhana (SAW tanpa bobot, atau dengan bobot 1)
-                // Sesuai request awal: "menjumlahkan nilai setiap kriteria"
                 $totalNilai += $values[$c->id] ?? 0;
             }
             $finalScores[$altId] = $totalNilai;
@@ -27,7 +25,7 @@ class ManualService
 
         // --- TAHAP 2: Perangkingan ---
         $timer->startStage();
-        arsort($finalScores); // Sortir total nilai dari tertinggi
+        arsort($finalScores);
         $timer->stopStage('tahap_2');
 
         $timings = $timer->timings;
@@ -35,9 +33,9 @@ class ManualService
 
         return [
             'steps' => [
-                'final_scores' => $finalScores // Masukkan ke dalam 'steps' agar seragam
+                'final_scores' => $finalScores
             ],
-            'values' => $finalScores, // Tetap kirim ini untuk backward compatibility jika perlu
+            'values' => $finalScores,
             'timings' => $timings,
         ];
     }

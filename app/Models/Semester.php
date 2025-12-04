@@ -9,12 +9,16 @@ class Semester extends Model
 {
     use HasFactory;
     protected $table = 'semester';
-    protected $fillable = ['nama', 'id_tahun_ajaran'];
 
-    public function tahunAjaran()
-    {
-        return $this->belongsTo(TahunAjaran::class, 'id_tahun_ajaran');
-    }
+
+    protected $fillable = [
+        'nama',
+        'tahun_mulai',
+        'tahun_selesai',
+        'status'
+    ];
+
+
 
     public function dataSiswaKelas()
     {

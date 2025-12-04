@@ -10,39 +10,32 @@ use Illuminate\Validation\Rule;
 
 class SemesterController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        // Tampilkan relasi 'tahunAjaran'
-        $semester = Semester::with('tahunAjaran')->latest()->paginate(10);
+        // Tidak perlu with('tahunAjaran') lagi
+        $semester = Semester::latest()->paginate(10);
         return view('layouts.admin.contents.semester.index', compact('semester'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        // Ambil data tahun ajaran untuk dropdown
-        $tahunAjaran = TahunAjaran::orderBy('tahun_mulai', 'desc')->get();
-        return view('layouts.admin.contents.semester.create', compact('tahunAjaran'));
+        // Tidak perlu ambil data tahun ajaran
+        return view('layouts.admin.contents.semester.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:100',
-            'id_tahun_ajaran' => 'required|exists:tahun_ajaran,id',
-            // Pastikan 'nama' dan 'id_tahun_ajaran' unik bersamaan
-            Rule::unique('semester')->where(function ($query) use ($request) {
-                return $query->where('id_tahun_ajaran', $request->id_tahun_ajaran);
-            }),
+            'nama' => 'required|string|max:100', // Ganjil/Genap
+            'tahun_mulai' => 'required|digits:4|integer|min:2000',
+            'tahun_selesai' => 'required|digits:4|integer|min:2000|gte:tahun_mulai',
+            'status' => 'required|in:aktif,nonaktif',
         ]);
+
+        // Logika Status Aktif: Jika yang baru aktif, matikan yang lain
+        if ($request->status == 'aktif') {
+            Semester::where('status', 'aktif')->update(['status' => 'nonaktif']);
+        }
 
         Semester::create($request->all());
 
@@ -50,28 +43,23 @@ class SemesterController extends Controller
             ->with('success', 'Semester berhasil ditambahkan.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Semester $semester) // Route Model Binding
+    public function edit(Semester $semester)
     {
-        // Ambil data tahun ajaran untuk dropdown
-        $tahunAjaran = TahunAjaran::orderBy('tahun_mulai', 'desc')->get();
-        return view('layouts.admin.contents.semester.edit', compact('semester', 'tahunAjaran'));
+        return view('layouts.admin.contents.semester.edit', compact('semester'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Semester $semester)
     {
         $request->validate([
             'nama' => 'required|string|max:100',
-            'id_tahun_ajaran' => 'required|exists:tahun_ajaran,id',
-            Rule::unique('semester')->where(function ($query) use ($request) {
-                return $query->where('id_tahun_ajaran', $request->id_tahun_ajaran);
-            })->ignore($semester->id),
+            'tahun_mulai' => 'required|digits:4|integer|min:2000',
+            'tahun_selesai' => 'required|digits:4|integer|min:2000|gte:tahun_mulai',
+            'status' => 'required|in:aktif,nonaktif',
         ]);
+
+        if ($request->status == 'aktif') {
+            Semester::where('id', '!=', $semester->id)->update(['status' => 'nonaktif']);
+        }
 
         $semester->update($request->all());
 
@@ -79,15 +67,11 @@ class SemesterController extends Controller
             ->with('success', 'Semester berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Semester $semester)
     {
-        // Tambahkan proteksi
         if ($semester->dataSiswaKelas()->count() > 0) {
             return redirect()->route('admin.semester.index')
-                ->with('error', 'Gagal! Semester ini masih memiliki data siswa terkait.');
+                ->with('error', 'Gagal! Semester ini memiliki data siswa.');
         }
 
         $semester->delete();

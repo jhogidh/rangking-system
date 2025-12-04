@@ -9,7 +9,7 @@
                     <p class="card-description">
                         Berikut adalah daftar <code>siswa</code> yang terdaftar di sistem.
                     </p>
-                    <a href="{{ route('admin.siswa.create') }}" class="btn btn-info btn-sm mb-3">
+                    <a href="{{ route('proses.siswa.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Siswa Baru
                     </a>
 
@@ -31,8 +31,8 @@
                             </thead>
                             <tbody>
                                 <!--
-                                              Loop data $siswa dari controller.
-                                            -->
+                                                  Loop data $siswa dari controller.
+                                                -->
                                 @forelse($siswa as $key => $s)
                                     <tr>
                                         <td>{{ $siswa->firstItem() + $key }}</td>

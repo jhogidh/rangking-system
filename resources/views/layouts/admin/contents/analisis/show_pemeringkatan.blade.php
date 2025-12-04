@@ -2,28 +2,13 @@
 
 @section('content')
     <div class="row">
-        <!-- 1. FORM FILTER -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hasil Pemeringkatan (Menu 4)</h4>
-                    <p class="card-description">
-                        Pilih <code>Semester</code> dan <code>Kelas</code> untuk menampilkan hasil perbandingan ranking.
-                    </p>
+                    <h4 class="card-title">Hasil Pemeringkatan (Menu 5)</h4>
+                    <p class="card-description">Pilih <code>Semester</code> dan <code>Kelas</code> untuk menampilkan hasil
+                        perbandingan ranking.</p>
 
-                    <!-- Pesan Sukses/Error -->
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-
-                    <!-- Form ini menggunakan method GET untuk filter -->
                     <form class="forms-sample" action="{{ route('admin.analisis.pemeringkatan') }}" method="GET">
                         <div class="row">
                             <div class="col-md-5">
@@ -35,7 +20,7 @@
                                             <option value="{{ $semester->id }}"
                                                 {{ $filters['id_semester'] == $semester->id ? 'selected' : '' }}>
                                                 {{ $semester->nama }}
-                                                ({{ $semester->tahunAjaran->tahun_mulai }}/{{ $semester->tahunAjaran->tahun_selesai }})
+                                                ({{ $semester->tahun_mulai }}/{{ $semester->tahun_selesai }})
                                             </option>
                                         @endforeach
                                     </select>
@@ -45,7 +30,7 @@
                                 <div class="form-group">
                                     <label for="id_kelas">Pilih Kelas</label>
                                     <select class="form-control" id="id_kelas" name="id_kelas">
-                                        <option value="">-- Semua Kelas (Juara Angkatan) --</option>
+                                        <option value="">-- Semua Kelas --</option>
                                         @foreach ($dropdowns['kelasList'] as $k)
                                             <option value="{{ $k->id }}"
                                                 {{ $filters['id_kelas'] == $k->id ? 'selected' : '' }}>
@@ -56,7 +41,7 @@
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-center">
-                                <button type="submit" class="btn btn-success btn-lg btn-block">Tampilkan Hasil</button>
+                                <button type="submit" class="btn btn-success btn-lg btn-block">Tampilkan</button>
                             </div>
                         </div>
                     </form>
@@ -64,22 +49,11 @@
             </div>
         </div>
 
-        <!-- TABEL HASIL RANKING (Hanya tampil jika ada filter) -->
         @if ($filters['id_semester'])
             <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <h4 class="card-title">Perbandingan Hasil Ranking</h4>
-                            <!-- Tombol Hitung Manual -->
-                            <form action="{{ route('admin.analisis.hitung.manual') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="id_semester" value="{{ $filters['id_semester'] }}">
-                                <input type="hidden" name="id_kelas" value="{{ $filters['id_kelas'] }}">
-                                <button type="submit" class="btn btn-secondary btn-sm">Hitung Ulang Manual (SAW)</button>
-                            </form>
-                        </div>
-
+                        <h4 class="card-title">Perbandingan Hasil Ranking</h4>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -105,9 +79,7 @@
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="5" class="text-center">
-                                                Tidak ada data ranking untuk ditampilkan. (Apakah data sudah di-import dan
-                                                di-hitung di Menu 2 & 3?)
+                                            <td colspan="5" class="text-center">Tidak ada data ranking. (Sudah dihitung?)
                                             </td>
                                         </tr>
                                     @endif

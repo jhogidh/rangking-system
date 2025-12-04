@@ -3,23 +3,30 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\User; // <-- IMPORT MODEL USER
-use Illuminate\Support\Facades\Hash; // <-- IMPORT HASH
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AdminUserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
+        // 1. Buat Admin
         User::updateOrCreate(
+            ['email' => 'admin@admin.com'],
             [
-                'email' => 'admin@admin.com',
-            ],
+                'name' => 'Administrator',
+                'password' => Hash::make('password'),
+                'role' => 'admin',
+            ]
+        );
+
+        // 2. Buat Guru (Wali Kelas)
+        User::updateOrCreate(
+            ['email' => 'guru@guru.com'],
             [
-                'name' => 'Admin',
-                'password' => Hash::make('admin'),
+                'name' => 'Guru',
+                'password' => Hash::make('password'),
+                'role' => 'guru',
             ]
         );
     }

@@ -15,15 +15,14 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Langkah 1: Ranking per Kriteria (Waktu:
-                        {{ number_format($timings['tahap_1'], 4) }} ms)</h4>
+                    <h4 class="card-title">Langkah 1: Ranking per Kriteria</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Siswa</th>
                                     @foreach ($criteria as $c)
-                                        <th>{{ $c->nama_kriteria }} (C{{ $c->id }})</th>
+                                        <th>{{ $c->nama_kriteria }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -43,19 +42,18 @@
             </div>
         </div>
 
-        <!-- LANGKAH 2: SKOR BORDA (n - rank) -->
+        <!-- LANGKAH 2: SKOR BORDA -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Langkah 2: Skor Borda (n - rank) (Waktu:
-                        {{ number_format($timings['tahap_2'], 4) }} ms)</h4>
+                    <h4 class="card-title">Langkah 2: Skor Borda (n - rank)</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     <th>Siswa</th>
                                     @foreach ($criteria as $c)
-                                        <th>Skor C{{ $c->id }}</th>
+                                        <th>Skor {{ $c->nama_kriteria }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -75,51 +73,18 @@
             </div>
         </div>
 
-        <!-- LANGKAH 3: SKOR x BOBOT ROC -->
+        <!-- HASIL AKHIR -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Langkah 3: Skor Borda x Bobot ROC (Waktu:
-                        {{ number_format($timings['tahap_3'], 4) }} ms)</h4>
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Siswa</th>
-                                    @foreach ($criteria as $c)
-                                        <th>Skor C{{ $c->id }} x {{ $c->bobot }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($siswaMap as $altId => $namaSiswa)
-                                    <tr>
-                                        <td>{{ $namaSiswa }}</td>
-                                        @foreach ($criteria as $c)
-                                            <td>{{ number_format($steps['weighted_scores'][$altId][$c->id] ?? 0, 4) }}</td>
-                                        @endforeach
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- LANGKAH 4 & 5: HASIL AKHIR -->
-        <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Langkah 4 & 5: Hasil Akhir & Ranking (Waktu:
-                        {{ number_format($timings['tahap_4'] + $timings['tahap_5'], 4) }} ms)</h4>
+                    <h4 class="card-title">Hasil Akhir & Ranking (Borda)</h4>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Ranking</th>
                                     <th>Siswa</th>
-                                    <th>Hasil Alternatif (Skor Akhir)</th>
+                                    <th>Skor Akhir</th>
                                 </tr>
                             </thead>
                             <tbody>

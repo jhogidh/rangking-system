@@ -21,11 +21,11 @@ class InputNilaiController extends Controller
      */
     public function index()
     {
-        // 1. Ambil data untuk dropdown filter
-        $semesters = Semester::with('tahunAjaran')->orderBy('id', 'desc')->get();
+        // REVISI: Hapus with('tahunAjaran'), karena kolom tahun sudah ada di tabel semester
+        $semesters = Semester::orderBy('id', 'desc')->get();
+
         $kelasList = Kelas::orderBy('nama', 'asc')->get();
 
-        // 2. Kembalikan view
         return view('layouts.admin.contents.input-nilai.index', compact(
             'semesters',
             'kelasList'
@@ -41,27 +41,22 @@ class InputNilaiController extends Controller
         $request->validate([
             'id_semester' => 'required|exists:semester,id',
             'id_kelas' => 'required|exists:kelas,id',
-            'file_import' => 'required|mimes:xlsx,xls,csv', // Hanya file Excel/CSV
+            'file_import' => 'required|mimes:xlsx,xls,csv',
         ]);
 
         try {
-            // 2. Ambil data dari form
             $id_semester = $request->id_semester;
             $id_kelas = $request->id_kelas;
 
             // 3. Jalankan "Mesin Import"
-            // Kita kirim id_semester dan id_kelas ke dalam "Mesin"
             Excel::import(new NilaiKriteriaImport($id_semester, $id_kelas), $request->file('file_import'));
 
-            // 4. Redirect kembali dengan sukses
             return redirect()->back()
                 ->with('success', 'Data nilai kriteria berhasil di-import!');
-        } catch (ValidationException $e) { // <-- Namespace yang benar
+        } catch (ValidationException $e) {
             $failures = $e->failures();
-            // Handle error validasi dari Excel (jika ada)
             return redirect()->back()->with('error', 'Gagal import! Error: ' . $failures[0]->errors()[0]);
         } catch (Exception $e) {
-            // Handle error umum (misal: siswa tidak ditemukan, dll)
             return redirect()->back()->with('error', 'Terjadi kesalahan. Pesan: ' . $e->getMessage());
         }
     }

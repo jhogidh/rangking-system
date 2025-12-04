@@ -7,12 +7,10 @@ use Illuminate\Support\Collection;
 
 class BordaService
 {
-
     public function calculate(array $alternatives, Collection $criteria): array
     {
         $timer = new TimerService();
-        $n = count($alternatives); // Jumlah seluruh alternatif
-        $altIds = array_keys($alternatives);
+        $n = count($alternatives);
 
         $steps = [
             'raw_values' => $alternatives,
@@ -23,33 +21,19 @@ class BordaService
         ];
 
         // --- TAHAP 1: Menentukan Ranking per Kriteria ---
-        // --- TAHAP 1: Menentukan Ranking per Kriteria (MODIFIED) ---
         $timer->startStage();
         foreach ($criteria as $c) {
             $tempScores = [];
             foreach ($alternatives as $altId => $values) {
                 $tempScores[$altId] = $values[$c->id] ?? 0;
             }
-            arsort($tempScores); // Sortir nilai (DESC)
+            arsort($tempScores);
 
+            $rank = 1;
             $ranks = [];
-            $rank = 1;          // Rangking yang akan ditempel
-            $counter = 1;       // Penghitung urutan baris (1, 2, 3, ...)
-            $prevScore = null;  // Menyimpan nilai skor sebelumnya
-
             foreach ($tempScores as $altId => $score) {
-                // Jika skor beda dengan sebelumnya, update rangking ke posisi counter saat ini
-                // Jika skor sama, rangking jangan berubah (tetap pakai $rank yang lama)
-                if ($score != $prevScore) {
-                    $rank = $counter;
-                }
-
-                $ranks[$altId] = $rank;
-
-                $prevScore = $score; // Simpan skor untuk pengecekan iterasi berikutnya
-                $counter++;          // Counter baris selalu nambah
+                $ranks[$altId] = $rank++;
             }
-
             $steps['ranks_per_criteria'][$c->id] = $ranks;
         }
         $timer->stopStage('tahap_1');
@@ -83,7 +67,7 @@ class BordaService
 
         // --- TAHAP 5: Perangkingan ---
         $timer->startStage();
-        arsort($steps['final_scores']); // Sortir skor akhir (DESC)
+        arsort($steps['final_scores']);
         $timer->stopStage('tahap_5');
 
         $timings = $timer->timings;
@@ -92,6 +76,7 @@ class BordaService
         return [
             'steps' => $steps,
             'timings' => $timings,
+            'values' => $steps['final_scores']
         ];
     }
 }

@@ -2,26 +2,22 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-8 grid-margin stretch-card">
+        <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Data Semester</h4>
+                    <h4 class="card-title">Data Semester & Tahun Ajaran</h4>
                     <p class="card-description">
-                        Berikut adalah daftar <code>semester</code> yang terdaftar.
+                        Daftar semester beserta tahun ajarannya.
                     </p>
-                    <a href="{{ route('admin.semester.create') }}" class="btn btn-info btn-sm mb-3">
+                    <a href="{{ route('proses.semester.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Semester Baru
                     </a>
 
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
+                        <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
                     @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
+                        <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
 
                     <div class="table-responsive">
@@ -29,8 +25,9 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Nama Semester</th>
+                                    <th>Semester</th>
                                     <th>Tahun Ajaran</th>
+                                    <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -39,37 +36,33 @@
                                     <tr>
                                         <td>{{ $semester->firstItem() + $key }}</td>
                                         <td>{{ $s->nama }}</td>
-                                        <!-- Tampilkan nama dari relasi -->
-                                        <td>{{ $s->tahunAjaran ? $s->tahunAjaran->tahun_mulai . ' / ' . $s->tahunAjaran->tahun_selesai : 'N/A' }}
+                                        <td>{{ $s->tahun_mulai }} / {{ $s->tahun_selesai }}</td>
+                                        <td>
+                                            @if ($s->status == 'aktif')
+                                                <label class="badge badge-success">Aktif</label>
+                                            @else
+                                                <label class="badge badge-secondary">Nonaktif</label>
+                                            @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('admin.semester.edit', $s->id) }}"
+                                            <a href="{{ route('proses.semester.edit', $s->id) }}"
                                                 class="btn btn-warning btn-sm">Edit</a>
-
-                                            <form action="{{ route('admin.semester.destroy', $s->id) }}" method="POST"
-                                                class="d-inline"
-                                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
-                                                @csrf
-                                                @method('DELETE')
+                                            <form action="{{ route('proses.semester.destroy', $s->id) }}" method="POST"
+                                                class="d-inline" onsubmit="return confirm('Hapus semester ini?');">
+                                                @csrf @method('DELETE')
                                                 <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
                                             </form>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" class="text-center">
-                                            Tidak ada data semester.
-                                        </td>
+                                        <td colspan="5" class="text-center">Tidak ada data.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-
-                    <div class="mt-4">
-                        {{ $semester->links() }}
-                    </div>
-
+                    <div class="mt-4">{{ $semester->links() }}</div>
                 </div>
             </div>
         </div>

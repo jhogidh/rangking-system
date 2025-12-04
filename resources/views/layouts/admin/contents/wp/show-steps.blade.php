@@ -11,17 +11,17 @@
             </div>
         </div>
 
+        <!-- LANGKAH 1: BOBOT TERNORMALISASI -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Langkah 1: Normalisasi Bobot (Waktu: {{ number_format($timings['tahap_1'], 4) }}
-                        ms)</h4>
+                    <h4 class="card-title">Langkah 1: Normalisasi Bobot</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
                                     @foreach ($criteria as $c)
-                                        <th>Bobot {{ $c->nama_kriteria }} (C{{ $c->id }})</th>
+                                        <th>{{ $c->nama_kriteria }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -38,58 +38,11 @@
             </div>
         </div>
 
+        <!-- LANGKAH 2: VEKTOR S -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title text-primary">Detail Perhitungan Pangkat (Nilai Awal ^ Bobot Normalisasi)</h4>
-                    <p class="card-description">
-                        Tabel ini menunjukkan rincian angka sebelum dikalikan menjadi Vektor S.
-                        Gunakan tabel ini untuk mencocokkan dengan Excel per kolom kriteria.
-                    </p>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-striped">
-                            <thead>
-                                <tr class="table-primary">
-                                    <th rowspan="2" class="text-center align-middle">Nama Siswa</th>
-                                    <th colspan="{{ count($criteria) }}" class="text-center">Hasil (Nilai ^ Bobot)</th>
-                                    <th rowspan="2" class="text-center align-middle">Hasil Kali (Vektor S)</th>
-                                </tr>
-                                <tr class="table-primary">
-                                    @foreach ($criteria as $c)
-                                        <th class="text-center"><small>{{ $c->nama_kriteria }}</small></th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{-- Loop data vector_s_details yang dikirim dari Service --}}
-                                @foreach ($steps['vector_s_details'] as $altId => $details)
-                                    <tr>
-                                        <td>{{ $siswaMap[$altId] ?? 'N/A' }}</td>
-
-                                        {{-- Loop nilai detail per kriteria --}}
-                                        @foreach ($criteria as $c)
-                                            <td class="text-right">
-                                                {{ number_format($details[$c->id] ?? 0, 5) }}
-                                            </td>
-                                        @endforeach
-
-                                        {{-- Tampilkan Total Vektor S sebagai pembanding --}}
-                                        <td class="text-right font-weight-bold">
-                                            {{ number_format($steps['vector_s'][$altId] ?? 0, 5) }}
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card">
-                <div class="card-body">
-                    <h4 class="card-title">Langkah 2: Rekap Vektor S (Waktu:
-                        {{ number_format($timings['tahap_2'], 4) }} ms)</h4>
+                    <h4 class="card-title">Langkah 2: Vektor S</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
@@ -112,18 +65,18 @@
             </div>
         </div>
 
+        <!-- HASIL AKHIR (VEKTOR V) -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Langkah 3 & 4: Hasil Akhir (Vektor V) & Ranking (Waktu:
-                        {{ number_format($timings['tahap_3'] + $timings['tahap_4'], 4) }} ms)</h4>
+                    <h4 class="card-title">Hasil Akhir (Vektor V) & Ranking</h4>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>Ranking</th>
                                     <th>Siswa</th>
-                                    <th>Hasil Alternatif (Vektor V)</th>
+                                    <th>Nilai Vektor V</th>
                                 </tr>
                             </thead>
                             <tbody>

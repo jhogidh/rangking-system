@@ -2,35 +2,18 @@
 
 @section('content')
     <div class="row">
-        <!-- FORM FILTER -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hitung Perankingan Weighted Product (Menu 3)</h4>
+                    <h4 class="card-title">Hitung Perankingan WP (Menu 4)</h4>
                     <p class="card-description">
-                        Pilih <code>Semester</code> dan <code>Kelas</code> yang datanya sudah di-import untuk
-                        menjalankan perhitungan WP dan melihat langkah-langkahnya.
+                        Metode Weighted Product (WP) menggunakan perkalian untuk menghubungkan rating atribut.
                     </p>
-
-                    <!-- Pesan Sukses/Error -->
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
-                        </div>
+                        <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
                     @if (session('error'))
-                        <div class="alert alert-danger" role="alert">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                        <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
 
                     <form class="forms-sample" action="{{ route('admin.wp.calculate') }}" method="POST">
@@ -43,8 +26,7 @@
                                         <option value="">-- Pilih Semester --</option>
                                         @foreach ($semesters as $semester)
                                             <option value="{{ $semester->id }}">{{ $semester->nama }}
-                                                ({{ $semester->tahunAjaran->tahun_mulai }}/{{ $semester->tahunAjaran->tahun_selesai }})
-                                            </option>
+                                                ({{ $semester->tahun_mulai }}/{{ $semester->tahun_selesai }})</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -53,7 +35,7 @@
                                 <div class="form-group">
                                     <label for="id_kelas">Pilih Kelas</label>
                                     <select class="form-control" id="id_kelas" name="id_kelas">
-                                        <option value="">-- Semua Kelas (Juara Angkatan) --</option>
+                                        <option value="">-- Semua Kelas --</option>
                                         @foreach ($kelasList as $kelas)
                                             <option value="{{ $kelas->id }}">{{ $kelas->nama }} {{ $kelas->sub }}
                                             </option>

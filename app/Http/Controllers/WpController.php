@@ -21,123 +21,50 @@ class WpController extends Controller
         $this->wpService = $wp;
     }
 
-    /**
-     * Helper privat untuk mengambil data mentah
-     */
+    // (Gunakan logika prepareData yang SAMA dengan ManualController)
     private function prepareData(Request $request)
-    {
-        $request->validate([
-            'id_semester' => 'required|exists:semester,id',
-            'id_kelas' => 'nullable|exists:kelas,id',
-        ]);
-
+    { /* ... Copy logic prepareData ... */
+        $request->validate(['id_semester' => 'required|exists:semester,id', 'id_kelas' => 'nullable|exists:kelas,id']);
         $id_semester = $request->id_semester;
         $id_kelas = $request->id_kelas;
-
-        // Ambil semua kriteria dari database
         $allCriteria = Kriteria::all();
-
         $query = DataSiswaKelas::where('id_semester', $id_semester)->with(['nilaiKriteria', 'siswa']);
-
-        if ($id_kelas) {
-            $query->where('id_kelas', $id_kelas);
-        }
-
+        if ($id_kelas) $query->where('id_kelas', $id_kelas);
         $dataSiswaSemester = $query->get();
-
-        if ($dataSiswaSemester->isEmpty()) {
-            return redirect()->back()->with('error', 'Tidak ada data siswa/nilai di semester/kelas yang dipilih.');
-        }
-
+        if ($dataSiswaSemester->isEmpty()) return redirect()->back()->with('error', 'Tidak ada data siswa.');
         $alternatives = [];
-        $siswaMap = []; // Untuk mapping ID ke Nama
-
+        $usedCriteriaIds = [];
+        $siswaMap = [];
         foreach ($dataSiswaSemester as $siswa) {
             $nilaiMap = $siswa->nilaiKriteria->pluck('nilai', 'id_kriteria');
-
-            // Skip jika siswa belum punya nilai sama sekali
             if ($nilaiMap->isEmpty()) continue;
-
             $alternatives[$siswa->id] = $nilaiMap;
-            // Pastikan relasi 'siswa' ada untuk mengambil nama
-            $siswaMap[$siswa->id] = $siswa->siswa->nama ?? 'Siswa ID: ' . $siswa->id;
+            $siswaMap[$siswa->id] = $siswa->siswa->nama;
+            $usedCriteriaIds = array_merge($usedCriteriaIds, $nilaiMap->keys()->all());
         }
-
-        if (empty($alternatives)) {
-            return redirect()->back()->with('error', 'Siswa ditemukan, tapi data nilai kriteria (hasil import) masih kosong.');
-        }
-
-        // 1. Ambil SEMUA kriteria dan urutkan prioritas
-        $criteria = $allCriteria->sortBy('prioritas');
-
-        // === PERBAIKAN LOGIKA SANITASI DATA (FIX NILAI 0) ===
-        // Masalah: WP menggunakan perkalian. Jika ada satu nilai 0/null (misal Ekstra), hasil akhir jadi 0.
-        // Solusi: Loop semua siswa, cek setiap kriteria. Jika kosong/0, isi dengan 1.
-
-        $criteriaIds = $criteria->pluck('id')->toArray();
-
-        foreach ($alternatives as $idSiswa => $nilai) {
-            // Konversi Collection ke array agar bisa dicek & diedit
-            $nilaiArray = $nilai instanceof \Illuminate\Support\Collection ? $nilai->toArray() : $nilai;
-
-            foreach ($criteriaIds as $idKriteria) {
-                // Cek apakah kriteria ini ada nilainya di siswa tersebut?
-                // Jika TIDAK ADA atau nilainya <= 0, ganti jadi 1.
-                if (!array_key_exists($idKriteria, $nilaiArray) || $nilaiArray[$idKriteria] <= 0) {
-                    $nilaiArray[$idKriteria] = 1; // 1 adalah angka aman untuk perkalian (neutral value)
-                }
-            }
-
-            // Update data siswa dengan nilai yang sudah disanitasi
-            $alternatives[$idSiswa] = $nilaiArray;
-        }
-
-        return [
-            'alternatives' => $alternatives,
-            'criteria' => $criteria,
-            'id_semester' => $id_semester,
-            'id_kelas' => $id_kelas,
-            'siswaMap' => $siswaMap,
-        ];
+        if (empty($alternatives)) return redirect()->back()->with('error', 'Siswa ditemukan, tapi data nilai kosong.');
+        $criteria = $allCriteria->whereIn('id', array_unique($usedCriteriaIds));
+        return ['alternatives' => $alternatives, 'criteria' => $criteria, 'id_semester' => $id_semester, 'id_kelas' => $id_kelas, 'siswaMap' => $siswaMap];
     }
 
-    /**
-     * Menampilkan halaman form pemicu WP (Menu 3 - Index)
-     */
     public function index()
     {
-        $semesters = Semester::with('tahunAjaran')->orderBy('id', 'desc')->get();
+        $semesters = Semester::orderBy('id', 'desc')->get();
         $kelasList = Kelas::orderBy('nama', 'asc')->get();
-
         return view('layouts.admin.contents.wp.index', compact('semesters', 'kelasList'));
     }
 
-    /**
-     * Menjalankan perhitungan WP dan menampilkan semua langkah
-     */
     public function calculate(Request $request)
     {
         $data = $this->prepareData($request);
+        if ($data instanceof \Illuminate\Http\RedirectResponse) return $data;
 
-        // Jika prepareData me-return redirect (karena error), teruskan return-nya
-        if ($data instanceof \Illuminate\Http\RedirectResponse) {
-            return $data;
-        }
-
-        // 1. Jalankan Service WP
-        // Service akan menggunakan $data['criteria'] yang sudah urut Prioritas
         $wpResult = $this->wpService->calculate($data['alternatives'], $data['criteria']);
 
-        // 2. Simpan hasil ranking (untuk Laporan Menu 4)
-        // Hapus ranking lama untuk siswa yang dihitung saat ini saja
         $processedSiswaIds = array_keys($data['alternatives']);
-
-        Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)
-            ->where('metode', 'WP')
-            ->delete();
+        Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)->where('metode', 'WP')->delete();
 
         $rank = 1;
-        // vector_v adalah hasil akhir preferensi WP
         foreach ($wpResult['steps']['vector_v'] as $id_data_siswa_kelas => $nilai_alternatif) {
             Ranking::create([
                 'id_data_siswa_kelas' => $id_data_siswa_kelas,
@@ -147,24 +74,18 @@ class WpController extends Controller
             ]);
         }
 
-        // 3. Simpan hasil statistik (untuk Laporan Menu 5)
         AnalisisPerbandingan::updateOrCreate(
-            [
-                'id_semester' => $data['id_semester'],
-                'id_kelas' => $data['id_kelas'],
-                'metode' => 'WP',
-            ],
+            ['id_semester' => $data['id_semester'], 'id_kelas' => $data['id_kelas'], 'metode' => 'WP'],
             [
                 'waktu_tahap_1' => $wpResult['timings']['tahap_1'] ?? 0,
                 'waktu_tahap_2' => $wpResult['timings']['tahap_2'] ?? 0,
                 'waktu_tahap_3' => $wpResult['timings']['tahap_3'] ?? 0,
                 'waktu_tahap_4' => $wpResult['timings']['tahap_4'] ?? 0,
                 'waktu_total' => $wpResult['timings']['total'] ?? 0,
-                // Kolom waktu_tahap_5 kosong karena WP biasanya cuma sampai tahap 4 (Perangkingan V)
+                'spearman_rho' => null,
             ]
         );
 
-        // 4. Kirim semua data langkah ke view
         return view('layouts.admin.contents.wp.show-steps', [
             'steps' => $wpResult['steps'],
             'timings' => $wpResult['timings'],

@@ -5,16 +5,15 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hitung Manual / SAW (Menu 4)</h4>
+                    <h4 class="card-title">Hitung Manual / SAW (Menu 1)</h4>
                     <p class="card-description">
                         Metode penjumlahan sederhana nilai kriteria.
                     </p>
-                    <!-- (Copy paste bagian Alert Error/Success dari view index Borda/WP di sini) -->
                     @if (session('success'))
-                        <div class="alert alert-success" role="alert">{{ session('success') }}</div>
+                        <div class="alert alert-success">{{ session('success') }}</div>
                     @endif
                     @if (session('error'))
-                        <div class="alert alert-danger" role="alert">{{ session('error') }}</div>
+                        <div class="alert alert-danger">{{ session('error') }}</div>
                     @endif
 
                     <form class="forms-sample" action="{{ route('admin.manual.calculate') }}" method="POST">
@@ -26,7 +25,10 @@
                                     <select class="form-control" id="id_semester" name="id_semester" required>
                                         <option value="">-- Pilih Semester --</option>
                                         @foreach ($semesters as $semester)
-                                            <option value="{{ $semester->id }}">{{ $semester->nama }}</option>
+                                            <option value="{{ $semester->id }}">
+                                                {{ $semester->nama }}
+                                                ({{ $semester->tahun_mulai }}/{{ $semester->tahun_selesai }})
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>

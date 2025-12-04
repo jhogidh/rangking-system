@@ -9,7 +9,7 @@
                     <p class="card-description">
                         Berikut adalah daftar <code>mapel non-akademik</code> (cth: Ekstrakurikuler).
                     </p>
-                    <a href="{{ route('admin.nonakademik.create') }}" class="btn btn-info btn-sm mb-3">
+                    <a href="{{ route('proses.nonakademik.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Non-Akademik
                     </a>
 
@@ -41,10 +41,10 @@
                                         <td>{{ $na->kode }}</td>
                                         <td>{{ $na->nama }}</td>
                                         <td>
-                                            <a href="{{ route('admin.nonakademik.edit', $na->id) }}"
+                                            <a href="{{ route('proses.nonakademik.edit', $na->id) }}"
                                                 class="btn btn-warning btn-sm">Edit</a>
 
-                                            <form action="{{ route('admin.nonakademik.destroy', $na->id) }}" method="POST"
+                                            <form action="{{ route('proses.nonakademik.destroy', $na->id) }}" method="POST"
                                                 class="d-inline"
                                                 onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                                 @csrf

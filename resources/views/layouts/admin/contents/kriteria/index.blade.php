@@ -12,7 +12,7 @@
                             <i class="mdi mdi-plus"></i> Tambah Kriteria
                         </a>
 
-                        <form action="{{ route('admin.kriteria.hitung') }}" method="POST">
+                        <form action="{{ route('admin.kriteria.hitung-roc') }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-success btn-sm">
                                 <i class="mdi mdi-calculator"></i> Hitung Ulang Bobot (ROC)

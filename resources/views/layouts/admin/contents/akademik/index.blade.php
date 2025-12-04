@@ -9,7 +9,7 @@
                     <p class="card-description">
                         Berikut adalah daftar <code>mapel akademik</code> yang terdaftar.
                     </p>
-                    <a href="{{ route('admin.akademik.create') }}" class="btn btn-info btn-sm mb-3">
+                    <a href="{{ route('proses.akademik.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Mapel Akademik
                     </a>
 
@@ -36,10 +36,10 @@
                                         <td>{{ $mapel->kode }}</td>
                                         <td>{{ $mapel->nama }}</td>
                                         <td>
-                                            <a href="{{ route('admin.akademik.edit', $mapel->id) }}"
+                                            <a href="{{ route('proses.akademik.edit', $mapel->id) }}"
                                                 class="btn btn-warning btn-sm">Edit</a>
 
-                                            <form action="{{ route('admin.akademik.destroy', $mapel->id) }}" method="POST"
+                                            <form action="{{ route('proses.akademik.destroy', $mapel->id) }}" method="POST"
                                                 class="d-inline"
                                                 onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                                 @csrf
