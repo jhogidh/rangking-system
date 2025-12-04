@@ -89,10 +89,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return view('layouts.admin.contents.dashboard'); // Bisa pakai view dashboard yang sama atau beda
         })->name('dashboard');
 
+
         // --- Master Data ---
         Route::resource('siswa', SiswaController::class);
         Route::resource('kelas', KelasController::class);
-
+        Route::get('kriteria', [KriteriaController::class, 'indexGuru'])->name('kriteriaguru.index');
         Route::resource('semester', SemesterController::class);
         Route::resource('akademik', AkademikController::class);
         Route::resource('nonakademik', NonAkademikController::class);

@@ -29,10 +29,8 @@
                         <!-- Tahun Ajaran dihapus -->
                         <li class="nav-item"> <a class="nav-link"
                                 href="{{ route('proses.semester.index') }}">Semester</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="{{ route('proses.akademik.index') }}">Mapel
-                                Akademik</a></li>
-                        <li class="nav-item"> <a class="nav-link" href="{{ route('proses.nonakademik.index') }}">Mapel
-                                Non-Akademik</a></li>
+                        <li class="nav-item"> <a class="nav-link"
+                                href="{{ route('proses.kriteriaguru.index') }}">Kriteria</a></li>
                     </ul>
                 </div>
             </li>
@@ -50,8 +48,8 @@
                 </a>
                 <div class="collapse" id="proses-input">
                     <ul class="nav flex-column sub-menu">
-                        <li class="nav-item"> <a class="nav-link"
-                                href="{{ route('proses.penempatan.index') }}">Penempatan Kelas</a></li>
+                        {{-- <li class="nav-item"> <a class="nav-link"
+                                href="{{ route('proses.penempatan.index') }}">Penempatan Kelas</a></li> --}}
                         <li class="nav-item"> <a class="nav-link" href="{{ route('proses.input-nilai.index') }}">Import
                                 Nilai (Excel)</a></li>
                     </ul>

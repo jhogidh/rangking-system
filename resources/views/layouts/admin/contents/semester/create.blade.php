@@ -30,15 +30,6 @@
                             <input type="number" class="form-control" name="tahun_selesai" placeholder="2025" required>
                         </div>
 
-                        <!-- Status -->
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select class="form-control" name="status" required>
-                                <option value="nonaktif">Nonaktif</option>
-                                <option value="aktif">Aktif</option>
-                            </select>
-                            <small class="text-muted">Jika dipilih Aktif, semester lain otomatis jadi Nonaktif.</small>
-                        </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Simpan</button>
                         <a href="{{ route('proses.semester.index') }}" class="btn btn-light">Batal</a>

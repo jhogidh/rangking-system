@@ -25,19 +25,17 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama Kelas</th>
-                                    <th>Sub Kelas</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <!--
-                                                      Loop data $kelas dari controller.
-                                                    -->
+                                                          Loop data $kelas dari controller.
+                                                        -->
                                 @forelse($kelas as $key => $k)
                                     <tr>
                                         <td>{{ $kelas->firstItem() + $key }}</td>
                                         <td>{{ $k->nama }}</td>
-                                        <td>{{ $k->sub ?? '-' }}</td>
                                         <td>
                                             <!-- Tombol Aksi -->
                                             <a href="{{ route('proses.kelas.edit', $k->id) }}"

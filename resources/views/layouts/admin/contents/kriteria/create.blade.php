@@ -14,11 +14,10 @@
                         @csrf
 
                         <div class="form-group">
-                            <label for="nama_kriteria">Nama Kriteria</label>
-                            <input type="text" class="form-control @error('nama_kriteria') is-invalid @enderror"
-                                id="nama_kriteria" name="nama_kriteria" placeholder="Contoh: Nilai Akademik"
-                                value="{{ old('nama_kriteria') }}" required>
-                            @error('nama_kriteria')
+                            <label for="nama">Nama Kriteria</label>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama"
+                                name="nama" placeholder="Contoh: Nilai Akademik" value="{{ old('nama') }}" required>
+                            @error('nama')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -39,6 +38,19 @@
                             </small>
 
                             @error('prioritas')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jenis">Jenis Kriteria</label>
+                            <select class="form-control @error('jenis') is-invalid @enderror" id="jenis" name="jenis">
+                                <option value="benefit">Benefit</option>
+                                <option value="cost">Cost</option>
+                            </select>
+                            @error('jenis')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>

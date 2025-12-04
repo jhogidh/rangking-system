@@ -11,24 +11,24 @@
                     </p>
 
                     <!--
-                      Form ini menunjuk ke route 'update'
-                      dan menggunakan method @method('PUT')
-                    -->
-                    <form class="forms-sample" action="{{ route('admin.siswa.update', $siswa->id) }}" method="POST">
+                                          Form ini menunjuk ke route 'update'
+                                          dan menggunakan method @method('PUT')
+                                        -->
+                    <form class="forms-sample" action="{{ route('proses.siswa.update', $siswa->id) }}" method="POST">
                         @csrf <!-- Wajib ada untuk keamanan -->
                         @method('PUT') <!-- Wajib ada untuk edit -->
 
-                        <!-- Field 'Kode Siswa' -->
+                        <!-- Field 'Nisn Siswa' -->
                         <div class="form-group">
-                            <label for="kode">Kode Siswa</label>
-                            <input type="text" class="form-control @error('kode') is-invalid @enderror" id="kode"
-                                name="kode" placeholder="Contoh: S-001" value="{{ old('kode', $siswa->kode) }}" required>
+                            <label for="nisn">Nisn Siswa</label>
+                            <input type="text" class="form-control @error('nisn') is-invalid @enderror" id="nisn"
+                                name="nisn" placeholder="Contoh: S-001" value="{{ old('nisn', $siswa->nisn) }}" required>
                             <!--
-                              old('kode', $siswa->kode)
-                              Artinya: Ambil data 'old' (jika validasi gagal),
-                              jika tidak ada, ambil data dari database.
-                            -->
-                            @error('kode')
+                                                  old('kode', $siswa->kode)
+                                                  Artinya: Ambil data 'old' (jika validasi gagal),
+                                                  jika tidak ada, ambil data dari database.
+                                                -->
+                            @error('nisn')
                                 <div class="invalid-feedback">
                                     {{ $message }}
                                 </div>
@@ -48,9 +48,22 @@
                             @enderror
                         </div>
 
+                        <!-- Field 'Tahun Masuk' -->
+                        <div class="form-group">
+                            <label for="tahun_masuk">Tahun Masuk</label>
+                            <input type="number" class="form-control @error('tahun_masuk') is-invalid @enderror"
+                                id="tahun_masuk" name="tahun_masuk" placeholder="Contoh: 2024"
+                                value="{{ old('tahun_masuk', $siswa->tahun_masuk) }}" required>
+                            @error('tahun_masuk')
+                                <div class="invalid-feedback">
+                                    {{ $message }}
+                                </div>
+                            @enderror
+                        </div>
+
                         <button type="submit" class="btn btn-primary mr-2">Update</button>
                         <!-- Tombol Batal -->
-                        <a href="{{ route('admin.siswa.index') }}" class="btn btn-light">
+                        <a href="{{ route('proses.siswa.index') }}" class="btn btn-light">
                             Cancel
                         </a>
                     </form>

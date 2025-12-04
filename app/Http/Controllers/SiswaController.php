@@ -36,18 +36,19 @@ class SiswaController extends Controller
     {
         // 1. Validasi data (seperti KelasController)
         $request->validate([
-            'kode' => 'required|string|unique:siswa,kode|max:100',
+            'nisn' => 'required|string|unique:siswa,nisn|max:100',
             'nama' => 'required|string|max:255',
         ]);
 
         // 2. Simpan data
         Siswa::create([
-            'kode' => $request->kode,
+            'nisn' => $request->kode || null,
             'nama' => $request->nama,
+            'tahun_masuk' => $request->tahun_masuk || null
         ]);
 
         // 3. Redirect kembali ke halaman index dengan pesan sukses
-        return redirect()->route('admin.siswa.index')
+        return redirect()->route('proses.siswa.index')
             ->with('success', 'Data siswa berhasil ditambahkan.');
     }
 
@@ -67,23 +68,30 @@ class SiswaController extends Controller
     {
         // 1. Validasi data (seperti KelasController)
         $request->validate([
-            'kode' => [
+            'nama' => 'required|string|max:255',
+            'nisn' => [
                 'required',
                 'string',
                 Rule::unique('siswa')->ignore($siswa->id), // Ignore ID ini
                 'max:100'
             ],
-            'nama' => 'required|string|max:255',
+            'tahun_masuk' => [
+                'required',
+                'string',
+                Rule::unique('siswa')->ignore($siswa->id), // Ignore ID ini
+                'max:100'
+            ]
         ]);
 
         // 2. Update data
         $siswa->update([
-            'kode' => $request->kode,
+            'nisn' => $request->nisn,
+            'tahun_masuk' => $request->tahun_masuk,
             'nama' => $request->nama,
         ]);
 
         // 3. Redirect kembali ke halaman index
-        return redirect()->route('admin.siswa.index')
+        return redirect()->route('proses.siswa.index')
             ->with('success', 'Data siswa berhasil diperbarui.');
     }
 
@@ -96,7 +104,7 @@ class SiswaController extends Controller
         $siswa->delete();
 
         // Redirect kembali
-        return redirect()->route('admin.siswa.index')
+        return redirect()->route('proses.siswa.index')
             ->with('success', 'Data siswa berhasil dihapus.');
     }
 }

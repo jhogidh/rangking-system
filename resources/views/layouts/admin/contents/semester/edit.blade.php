@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Edit Semester</h4>
-                    <form class="forms-sample" action="{{ route('admin.semester.update', $semester->id) }}" method="POST">
+                    <form class="forms-sample" action="{{ route('proses.semester.update', $semester->id) }}" method="POST">
                         @csrf @method('PUT')
 
                         <div class="form-group">
@@ -29,17 +29,9 @@
                                 value="{{ $semester->tahun_selesai }}" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="status">Status</label>
-                            <select class="form-control" name="status" required>
-                                <option value="nonaktif" {{ $semester->status == 'nonaktif' ? 'selected' : '' }}>Nonaktif
-                                </option>
-                                <option value="aktif" {{ $semester->status == 'aktif' ? 'selected' : '' }}>Aktif</option>
-                            </select>
-                        </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Update</button>
-                        <a href="{{ route('admin.semester.index') }}" class="btn btn-light">Batal</a>
+                        <a href="{{ route('proses.semester.index') }}" class="btn btn-light">Batal</a>
                     </form>
                 </div>
             </div>

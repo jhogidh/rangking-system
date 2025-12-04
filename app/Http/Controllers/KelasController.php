@@ -37,13 +37,11 @@ class KelasController extends Controller
         // 1. Validasi data
         $request->validate([
             'nama' => 'required|string|unique:kelas,nama|max:100',
-            'sub' => 'nullable|string|max:50', // 'sub' boleh kosong
         ]);
 
         // 2. Simpan data
         Kelas::create([
             'nama' => $request->nama,
-            'sub' => $request->sub,
         ]);
 
         // 3. Redirect kembali ke halaman index
@@ -72,14 +70,12 @@ class KelasController extends Controller
                 'string',
                 Rule::unique('kelas')->ignore($kela->id), // Ignore ID ini
                 'max:100'
-            ],
-            'sub' => 'nullable|string|max:50',
+            ]
         ]);
 
         // 2. Update data
         $kela->update([
             'nama' => $request->nama,
-            'sub' => $request->sub,
         ]);
 
         // 3. Redirect kembali ke halaman index

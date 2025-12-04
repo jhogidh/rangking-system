@@ -9,9 +9,9 @@
                     <p class="card-description">
                         Berikut adalah daftar <code>siswa</code> yang terdaftar di sistem.
                     </p>
-                    <a href="{{ route('proses.siswa.create') }}" class="btn btn-info btn-sm mb-3">
+                    {{-- <a href="{{ route('proses.siswa.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Siswa Baru
-                    </a>
+                    </a> --}}
 
                     @if (session('success'))
                         <div class="alert alert-success" role="alert">
@@ -24,20 +24,22 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Kode Siswa</th>
+                                    <th>NISN</th>
                                     <th>Nama Siswa</th>
+                                    <th>Tahun Masuk</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <!--
-                                                              Loop data $siswa dari controller.
-                                                            -->
+                                                                                  Loop data $siswa dari controller.
+                                                                                -->
                                 @forelse($siswa as $key => $s)
                                     <tr>
                                         <td>{{ $siswa->firstItem() + $key }}</td>
-                                        <td>{{ $s->kode }}</td>
+                                        <td>{{ $s->nisn }}</td>
                                         <td>{{ $s->nama }}</td>
+                                        <td>{{ $s->tahun_masuk }}</td>
                                         <td>
                                             <!-- Tombol Aksi -->
                                             <a href="{{ route('proses.siswa.edit', $s->id) }}"

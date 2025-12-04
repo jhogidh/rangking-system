@@ -10,27 +10,12 @@ return new class extends Migration
     {
         // === BAGIAN 1: MASTER DATA (Independen) ===
 
-        // 1. akademik
-        Schema::create('akademik', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->string('kode')->unique();
-            $table->timestamps();
-        });
-
-        // 2. nonakademik
-        Schema::create('nonakademik', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->string('kode')->unique();
-            $table->timestamps();
-        });
-
         // 3. siswa
         Schema::create('siswa', function (Blueprint $table) {
             $table->id();
-            $table->string('kode')->unique();
+            $table->string('nisn')->unique()->nullable();;
             $table->string('nama');
+            $table->string('tahun_masuk')->nullable();;
             $table->timestamps();
         });
 
@@ -38,7 +23,6 @@ return new class extends Migration
         Schema::create('kelas', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('sub')->nullable();
             $table->timestamps();
         });
 
@@ -49,14 +33,14 @@ return new class extends Migration
             $table->string('nama');
             $table->year('tahun_mulai');
             $table->year('tahun_selesai');
-            $table->enum('status', ['aktif', 'nonaktif'])->default('nonaktif');
             $table->timestamps();
         });
 
         // 6. kriteria
         Schema::create('kriteria', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_kriteria');
+            $table->string('nama');
+            $table->string('jenis');
             $table->integer('prioritas')->nullable();
             $table->decimal('bobot', 5, 4)->default(0); // Presisi bobot ditingkatkan
             $table->timestamps();
@@ -159,7 +143,5 @@ return new class extends Migration
         Schema::dropIfExists('kriteria');
         Schema::dropIfExists('kelas');
         Schema::dropIfExists('siswa');
-        Schema::dropIfExists('nonakademik');
-        Schema::dropIfExists('akademik');
     }
 };

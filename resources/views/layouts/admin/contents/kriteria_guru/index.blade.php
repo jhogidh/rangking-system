@@ -7,7 +7,7 @@
                 <div class="card-body">
                     <h4 class="card-title">Data Kriteria & Pembobotan (ROC)</h4>
 
-                    <div class="d-flex justify-content-between mb-3">
+                    {{-- <div class="d-flex justify-content-between mb-3">
                         <a href="{{ route('admin.kriteria.create') }}" class="btn btn-info btn-sm">
                             <i class="mdi mdi-plus"></i> Tambah Kriteria
                         </a>
@@ -18,7 +18,7 @@
                                 <i class="mdi mdi-calculator"></i> Hitung Ulang Bobot (ROC)
                             </button>
                         </form>
-                    </div>
+                    </div> --}}
 
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
@@ -44,7 +44,7 @@
                                         <td>
                                             <span class="badge badge-primary">{{ $k->prioritas }}</span>
                                         </td>
-                                        <td>{{ $k->nama }}</td>
+                                        <td>{{ $k->nama_kriteria }}</td>
                                         <td>
                                             {{ number_format($k->bobot, 4) }}
                                         </td>

@@ -10,7 +10,7 @@
                         Ubah data kelas di bawah ini.
                     </p>
 
-                    <form class="forms-sample" action="{{ route('admin.kelas.update', $kelas->id) }}" method="POST">
+                    <form class="forms-sample" action="{{ route('proses.kelas.update', $kelas->id) }}" method="POST">
                         @csrf
                         @method('PUT')
 
@@ -27,20 +27,9 @@
                             @enderror
                         </div>
 
-                        <!-- Field 'Sub Kelas' -->
-                        <div class="form-group">
-                            <label for="sub">Sub Kelas (Opsional)</label>
-                            <input type="text" class="form-control @error('sub') is-invalid @enderror" id="sub"
-                                name="sub" placeholder="Contoh: A / B / Unggulan" value="{{ old('sub', $kelas->sub) }}">
-                            @error('sub')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Update</button>
-                        <a href="{{ route('admin.kelas.index') }}" class="btn btn-light">
+                        <a href="{{ route('proses.kelas.index') }}" class="btn btn-light">
                             Cancel
                         </a>
                     </form>

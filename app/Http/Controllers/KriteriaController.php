@@ -16,6 +16,13 @@ class KriteriaController extends Controller
         return view('layouts.admin.contents.kriteria.index', compact('kriteria'));
     }
 
+    public function indexGuru()
+    {
+        // Urutkan berdasarkan prioritas (1, 2, 3...)
+        $kriteria = Kriteria::orderBy('prioritas', 'asc')->paginate(10);
+        return view('layouts.admin.contents.kriteria_guru.index', compact('kriteria'));
+    }
+
     public function create()
     {
         return view('layouts.admin.contents.kriteria.create');
@@ -24,16 +31,17 @@ class KriteriaController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_kriteria' => 'required|string|unique:kriteria,nama_kriteria|max:255',
+            'nama' => 'required|string|unique:kriteria,nama|max:255',
             // Validasi prioritas harus angka & unik
             'prioritas' => 'required|integer|min:1|unique:kriteria,prioritas',
         ]);
 
         // Simpan prioritas saja, bobot biarkan 0 dulu
         Kriteria::create([
-            'nama_kriteria' => $request->nama_kriteria,
+            'nama' => $request->nama,
             'prioritas' => $request->prioritas,
             'bobot' => 0,
+            'jenis' => $request->jenis
         ]);
 
         return redirect()->route('admin.kriteria.index')
@@ -48,7 +56,7 @@ class KriteriaController extends Controller
     public function update(Request $request, Kriteria $kriteria)
     {
         $request->validate([
-            'nama_kriteria' => [
+            'nama' => [
                 'required',
                 'string',
                 'max:255',
@@ -60,11 +68,15 @@ class KriteriaController extends Controller
                 'min:1',
                 Rule::unique('kriteria')->ignore($kriteria->id),
             ],
+            'jenis' => [
+                'required',
+            ]
         ]);
 
         $kriteria->update([
-            'nama_kriteria' => $request->nama_kriteria,
+            'nama' => $request->nama,
             'prioritas' => $request->prioritas,
+            'jenis' => $request->jenis
             // Bobot tidak diupdate manual, tetap pakai nilai lama sampai dihitung ulang
         ]);
 

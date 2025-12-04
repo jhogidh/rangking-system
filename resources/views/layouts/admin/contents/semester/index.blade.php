@@ -27,7 +27,6 @@
                                     <th>No</th>
                                     <th>Semester</th>
                                     <th>Tahun Ajaran</th>
-                                    <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -37,13 +36,6 @@
                                         <td>{{ $semester->firstItem() + $key }}</td>
                                         <td>{{ $s->nama }}</td>
                                         <td>{{ $s->tahun_mulai }} / {{ $s->tahun_selesai }}</td>
-                                        <td>
-                                            @if ($s->status == 'aktif')
-                                                <label class="badge badge-success">Aktif</label>
-                                            @else
-                                                <label class="badge badge-secondary">Nonaktif</label>
-                                            @endif
-                                        </td>
                                         <td>
                                             <a href="{{ route('proses.semester.edit', $s->id) }}"
                                                 class="btn btn-warning btn-sm">Edit</a>

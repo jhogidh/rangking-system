@@ -25,17 +25,6 @@
                             @enderror
                         </div>
 
-                        <!-- Field 'Sub Kelas' -->
-                        <div class="form-group">
-                            <label for="sub">Sub Kelas (Opsional)</label>
-                            <input type="text" class="form-control @error('sub') is-invalid @enderror" id="sub"
-                                name="sub" placeholder="Contoh: A / B / Unggulan" value="{{ old('sub') }}">
-                            @error('sub')
-                                <div class="invalid-feedback">
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Submit</button>
                         <a href="{{ route('proses.kelas.index') }}" class="btn btn-light">

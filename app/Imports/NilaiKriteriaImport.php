@@ -28,7 +28,7 @@ class NilaiKriteriaImport implements ToCollection, WithHeadingRow, WithCalculate
         $this->id_kelas    = $id_kelas;
 
         // Ambil ID dan Nama Kriteria untuk dicocokkan nanti
-        $this->kriteriaMap = Kriteria::pluck('id', 'nama_kriteria');
+        $this->kriteriaMap = Kriteria::pluck('id', 'nama');
 
         if ($this->kriteriaMap->isEmpty()) {
             throw new Exception("Import Gagal: Data Kriteria di database kosong.");
@@ -44,9 +44,12 @@ class NilaiKriteriaImport implements ToCollection, WithHeadingRow, WithCalculate
             }
 
             // 2. Cari atau Buat Siswa
-            $siswa = Siswa::firstOrCreate(
-                ['nama' => $row['nama']],
-                ['kode' => 'S-' . Str::random(8)] // Kode random jika siswa baru
+            $siswa = Siswa::updateOrCreate(
+                ['nama' => $row['nama']], // Argumen 1: Cari berdasarkan Nama
+                [                         // Argumen 2: Data baru jika nama tidak ditemukan
+                    'nisn'        => $row['nisn'],
+                    'tahun_masuk' => $row['tahun_masuk'] // Perhatikan underscore '_' karena header aslinya "Tahun Masuk"
+                ]
             );
 
             // 3. Masukkan Siswa ke Kelas & Semester ini
