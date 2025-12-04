@@ -49,9 +49,9 @@
                             <label for="id_kelas">Pilih Kelas</label>
                             <select class="form-control" id="id_kelas" name="id_kelas">
                                 <!--
-                                          Opsi "Semua Kelas" akan mengirimkan value null,
-                                          yang akan diartikan sebagai "Juara Angkatan/Sekolah"
-                                        -->
+                                                  Opsi "Semua Kelas" akan mengirimkan value null,
+                                                  yang akan diartikan sebagai "Juara Angkatan/Sekolah"
+                                                -->
                                 <option value="">-- Semua Kelas (Juara Angkatan) --</option>
                                 @foreach ($kelasList as $kelas)
                                     <option value="{{ $kelas->id }}">{{ $kelas->nama }} {{ $kelas->sub }}</option>

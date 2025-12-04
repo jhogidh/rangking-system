@@ -31,8 +31,8 @@
                             </thead>
                             <tbody>
                                 <!--
-                                                  Loop data $siswa dari controller.
-                                                -->
+                                                              Loop data $siswa dari controller.
+                                                            -->
                                 @forelse($siswa as $key => $s)
                                     <tr>
                                         <td>{{ $siswa->firstItem() + $key }}</td>
@@ -40,10 +40,10 @@
                                         <td>{{ $s->nama }}</td>
                                         <td>
                                             <!-- Tombol Aksi -->
-                                            <a href="{{ route('admin.siswa.edit', $s->id) }}"
+                                            <a href="{{ route('proses.siswa.edit', $s->id) }}"
                                                 class="btn btn-warning btn-sm">Edit</a>
 
-                                            <form action="{{ route('admin.siswa.destroy', $s->id) }}" method="POST"
+                                            <form action="{{ route('proses.siswa.destroy', $s->id) }}" method="POST"
                                                 class="d-inline"
                                                 onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?');">
                                                 @csrf

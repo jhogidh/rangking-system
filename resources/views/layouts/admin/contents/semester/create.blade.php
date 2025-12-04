@@ -6,7 +6,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Tambah Semester Baru</h4>
-                    <form class="forms-sample" action="{{ route('admin.semester.store') }}" method="POST">
+                    <form class="forms-sample" action="{{ route('proses.semester.store') }}" method="POST">
                         @csrf
 
                         <!-- Nama Semester -->
@@ -41,7 +41,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Simpan</button>
-                        <a href="{{ route('admin.semester.index') }}" class="btn btn-light">Batal</a>
+                        <a href="{{ route('proses.semester.index') }}" class="btn btn-light">Batal</a>
                     </form>
                 </div>
             </div>

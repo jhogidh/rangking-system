@@ -10,7 +10,7 @@
                         Masukkan data kelas baru di bawah ini.
                     </p>
 
-                    <form class="forms-sample" action="{{ route('admin.kelas.store') }}" method="POST">
+                    <form class="forms-sample" action="{{ route('proses.kelas.store') }}" method="POST">
                         @csrf
 
                         <!-- Field 'Nama Kelas' -->
@@ -38,7 +38,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary mr-2">Submit</button>
-                        <a href="{{ route('admin.kelas.index') }}" class="btn btn-light">
+                        <a href="{{ route('proses.kelas.index') }}" class="btn btn-light">
                             Cancel
                         </a>
                     </form>

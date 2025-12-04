@@ -39,7 +39,7 @@ class SemesterController extends Controller
 
         Semester::create($request->all());
 
-        return redirect()->route('admin.semester.index')
+        return redirect()->route('proses.semester.index')
             ->with('success', 'Semester berhasil ditambahkan.');
     }
 

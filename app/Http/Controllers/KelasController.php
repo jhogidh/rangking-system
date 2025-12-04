@@ -47,7 +47,7 @@ class KelasController extends Controller
         ]);
 
         // 3. Redirect kembali ke halaman index
-        return redirect()->route('admin.kelas.index')
+        return redirect()->route('proses.kelas.index')
             ->with('success', 'Data kelas berhasil ditambahkan.');
     }
 
@@ -83,7 +83,7 @@ class KelasController extends Controller
         ]);
 
         // 3. Redirect kembali ke halaman index
-        return redirect()->route('admin.kelas.index')
+        return redirect()->route('proses.kelas.index')
             ->with('success', 'Data kelas berhasil diperbarui.');
     }
 
@@ -96,7 +96,7 @@ class KelasController extends Controller
         $kela->delete();
 
         // Redirect kembali
-        return redirect()->route('admin.kelas.index')
+        return redirect()->route('proses.kelas.index')
             ->with('success', 'Data kelas berhasil dihapus.');
     }
 }

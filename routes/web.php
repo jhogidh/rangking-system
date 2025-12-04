@@ -58,7 +58,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // --- SPK ---
         Route::resource('kriteria', KriteriaController::class)->parameters(['kriteria' => 'kriteria']);
-        Route::post('kriteria/hitung-roc', [KriteriaController::class, 'hitungROC'])->name('kriteria.hitung-roc');
+        Route::post('kriteria/hitung-roc', [KriteriaController::class, 'hitungBobot'])->name('kriteria.hitung-roc');
         Route::post('kriteria/update-prioritas', [KriteriaController::class, 'updatePrioritas'])->name('kriteria.update-prioritas');
 
         Route::get('hitung-manual', [ManualController::class, 'index'])->name('manual.index');
