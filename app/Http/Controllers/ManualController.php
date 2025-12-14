@@ -21,7 +21,6 @@ class ManualController extends Controller
         $this->manualService = $manual;
     }
 
-    // Helper untuk mengambil data dari DataNilaiKriteria (hasil import)
     private function prepareData(Request $request)
     {
         $request->validate([
@@ -79,15 +78,12 @@ class ManualController extends Controller
         $data = $this->prepareData($request);
         if ($data instanceof \Illuminate\Http\RedirectResponse) return $data;
 
-        // 1. Hitung
         $manualResult = $this->manualService->calculate($data['alternatives'], $data['criteria']);
 
-        // 2. Simpan Ranking
         $processedSiswaIds = array_keys($data['alternatives']);
         Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)->where('metode', 'Manual')->delete();
 
         $rank = 1;
-        // Ambil skor akhir dari 'steps' -> 'final_scores'
         $scores = $manualResult['steps']['final_scores'];
 
         foreach ($scores as $id_data_siswa_kelas => $nilai_alternatif) {
@@ -99,7 +95,6 @@ class ManualController extends Controller
             ]);
         }
 
-        // 3. Simpan Statistik
         $queryStat = AnalisisPerbandingan::where('id_semester', $data['id_semester'])->where('metode', 'Manual');
         if ($data['id_kelas']) $queryStat->where('id_kelas', $data['id_kelas']);
         else $queryStat->whereNull('id_kelas');

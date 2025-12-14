@@ -4,26 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Imports\NilaiKriteriaImport;
-
 use Illuminate\Http\Request;
 
 
 use App\Models\Semester;
 use App\Models\Kelas;
-use MaatWebsite\Excel\Validators\ValidationException; // <-- Import untuk catch error
-use Exception; // <-- Import untuk catch error
+use MaatWebsite\Excel\Validators\ValidationException;
+use Exception;
 use Maatwebsite\Excel\Facades\Excel;
 
 class InputNilaiController extends Controller
 {
-    /**
-     * Menampilkan halaman form import (Alur B - Wajib 2)
-     */
     public function index()
     {
-        // REVISI: Hapus with('tahunAjaran'), karena kolom tahun sudah ada di tabel semester
         $semesters = Semester::orderBy('id', 'desc')->get();
-
         $kelasList = Kelas::orderBy('nama', 'asc')->get();
 
         return view('layouts.admin.contents.input-nilai.index', compact(
@@ -32,12 +26,8 @@ class InputNilaiController extends Controller
         ));
     }
 
-    /**
-     * Memproses file Excel yang di-upload
-     */
     public function store(Request $request)
     {
-        // 1. Validasi input
         $request->validate([
             'id_semester' => 'required|exists:semester,id',
             'id_kelas' => 'required|exists:kelas,id',
@@ -48,7 +38,6 @@ class InputNilaiController extends Controller
             $id_semester = $request->id_semester;
             $id_kelas = $request->id_kelas;
 
-            // 3. Jalankan "Mesin Import"
             Excel::import(new NilaiKriteriaImport($id_semester, $id_kelas), $request->file('file_import'));
 
             return redirect()->back()

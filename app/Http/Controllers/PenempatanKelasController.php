@@ -14,8 +14,6 @@ class PenempatanKelasController extends Controller
 {
     public function index(Request $request)
     {
-        // UPDATE: Hapus with('tahunAjaran'), ambil langsung dari Semester
-        // Sebelumnya: $semesters = Semester::with('tahunAjaran')->orderBy('id', 'desc')->get();
         $semesters = Semester::orderBy('id', 'desc')->get();
 
         $kelasList = Kelas::orderBy('nama', 'asc')->get();
@@ -29,25 +27,21 @@ class PenempatanKelasController extends Controller
             $selectedSemester = Semester::find($request->id_semester);
             $selectedKelas = Kelas::find($request->id_kelas);
 
-            // Ambil ID siswa yang SUDAH ADA di kelas ini
             $siswaSudahDitempatkanIds = DataSiswaKelas::where('id_semester', $request->id_semester)
                 ->where('id_kelas', $request->id_kelas)
                 ->pluck('id_siswa');
 
-            // Ambil data siswa yang SUDAH ADA
             $siswaDiDalamKelas = DataSiswaKelas::where('id_semester', $request->id_semester)
                 ->where('id_kelas', $request->id_kelas)
                 ->with('siswa')
                 ->get();
 
-            // Ambil ID siswa yang ada di kelas LAIN
             $siswaDiKelasLainIds = DataSiswaKelas::where('id_semester', $request->id_semester)
                 ->where('id_kelas', '!=', $request->id_kelas)
                 ->pluck('id_siswa');
 
             $excludeIds = $siswaSudahDitempatkanIds->merge($siswaDiKelasLainIds);
 
-            // Siswa yang tersedia
             $siswaDiLuarKelas = Siswa::whereNotIn('id', $excludeIds)
                 ->orderBy('nama', 'asc')
                 ->get();

@@ -5,15 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-// --- Model yang Dibutuhkan ---
 use App\Models\AnalisisPerbandingan;
-use App\Models\DataSiswaKelas;
 use App\Models\Ranking;
 use App\Models\Semester;
 use App\Models\Kelas;
-use App\Models\Kriteria;
 use App\Services\SPK\AnalysisService;
-use App\Services\SPK\ManualService;
 
 class AnalisisController extends Controller
 {

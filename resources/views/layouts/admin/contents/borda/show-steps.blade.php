@@ -2,11 +2,40 @@
 
 @section('content')
     <div class="row">
+        <!-- RINGKASAN WAKTU BORDA -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hasil Perhitungan Borda (Semua Langkah)</h4>
-                    <a href="{{ route('admin.borda.index') }}" class="btn btn-secondary btn-sm mb-3">Kembali ke Form</a>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Statistik Waktu Eksekusi (Borda)</h4>
+                        <a href="{{ route('admin.borda.index') }}" class="btn btn-outline-secondary btn-sm">Kembali</a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Tahap 1 (Rank Kriteria)</th>
+                                    <th>Tahap 2 (Skor Borda)</th>
+                                    <th>Tahap 3 (Bobot ROC)</th>
+                                    <th>Tahap 4 (Penjumlahan)</th>
+                                    <th>Tahap 5 (Ranking Akhir)</th>
+                                    <th class="bg-success text-white">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ number_format($timings['tahap_1'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_2'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_3'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_4'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_5'], 4) }} ms</td>
+                                    <td class="bg-success text-white font-weight-bold">
+                                        {{ number_format($timings['total'], 4) }} ms</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -20,6 +49,7 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Siswa</th>
                                     @foreach ($criteria as $c)
                                         <th>{{ $c->nama_kriteria }}</th>
@@ -27,8 +57,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php $i = 1; ?>
                                 @foreach ($siswaMap as $altId => $namaSiswa)
                                     <tr>
+                                        <td><?= $i++ ?></td>
                                         <td>{{ $namaSiswa }}</td>
                                         @foreach ($criteria as $c)
                                             <td>{{ $steps['ranks_per_criteria'][$c->id][$altId] ?? 'N/A' }}</td>
@@ -51,6 +83,7 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Siswa</th>
                                     @foreach ($criteria as $c)
                                         <th>Skor {{ $c->nama_kriteria }}</th>
@@ -58,8 +91,10 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php $i = 1; ?>
                                 @foreach ($siswaMap as $altId => $namaSiswa)
                                     <tr>
+                                        <td><?= $i++ ?></td>
                                         <td>{{ $namaSiswa }}</td>
                                         @foreach ($criteria as $c)
                                             <td>{{ $steps['borda_scores'][$altId][$c->id] ?? 'N/A' }}</td>
@@ -72,6 +107,8 @@
                 </div>
             </div>
         </div>
+
+        <!-- LANGKAH 3 (Optional ditampilkan, bisa skip kalau terlalu panjang) -->
 
         <!-- HASIL AKHIR -->
         <div class="col-lg-12 grid-margin stretch-card">

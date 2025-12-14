@@ -10,7 +10,7 @@ use App\Models\Kriteria;
 use App\Models\DataSiswaKelas;
 use App\Models\Ranking;
 use App\Models\AnalisisPerbandingan;
-use App\Models\Siswa; // Kita butuh ini
+use App\Models\Siswa;
 use App\Services\SPK\BordaService;
 
 class BordaController extends Controller
@@ -22,9 +22,8 @@ class BordaController extends Controller
         $this->bordaService = $borda;
     }
 
-    // (Gunakan logika prepareData yang SAMA dengan ManualController)
     private function prepareData(Request $request)
-    { /* ... Copy from ManualController ... */
+    {
         $request->validate(['id_semester' => 'required|exists:semester,id', 'id_kelas' => 'nullable|exists:kelas,id']);
         $id_semester = $request->id_semester;
         $id_kelas = $request->id_kelas;

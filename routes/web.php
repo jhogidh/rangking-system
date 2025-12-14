@@ -2,6 +2,7 @@
 
 // Controller Bawaan
 
+use App\Http\Controllers\LaporanGabunganController;
 use App\Http\Controllers\ManualController;
 use App\Http\Controllers\AkademikController;
 use App\Http\Controllers\ProfileController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\KriteriaController;
 use App\Http\Controllers\PenempatanKelasController;
 use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\StatusInputController;
 use App\Http\Controllers\WpController;
 // --- Untuk Rute Tes ---
 use Illuminate\Http\Request;
@@ -73,6 +75,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('analisis/pemeringkatan', [AnalisisController::class, 'showPemeringkatan'])->name('analisis.pemeringkatan');
         Route::get('analisis/pengujian', [AnalisisController::class, 'showPengujian'])->name('analisis.pengujian');
         Route::post('analisis/hitung-spearman', [AnalisisController::class, 'hitungSpearman'])->name('analisis.hitung.spearman');
+        Route::get('analisis/gabungan', [LaporanGabunganController::class, 'index'])->name('analisis.gabungan');
+
+        Route::get('status-input', [StatusInputController::class, 'index'])->name('status-input.index');
     });
 
 

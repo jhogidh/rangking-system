@@ -11,14 +11,12 @@ class KriteriaController extends Controller
 {
     public function index()
     {
-        // Urutkan berdasarkan prioritas (1, 2, 3...)
         $kriteria = Kriteria::orderBy('prioritas', 'asc')->paginate(10);
         return view('layouts.admin.contents.kriteria.index', compact('kriteria'));
     }
 
     public function indexGuru()
     {
-        // Urutkan berdasarkan prioritas (1, 2, 3...)
         $kriteria = Kriteria::orderBy('prioritas', 'asc')->paginate(10);
         return view('layouts.admin.contents.kriteria_guru.index', compact('kriteria'));
     }
@@ -32,11 +30,9 @@ class KriteriaController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|unique:kriteria,nama|max:255',
-            // Validasi prioritas harus angka & unik
             'prioritas' => 'required|integer|min:1|unique:kriteria,prioritas',
         ]);
 
-        // Simpan prioritas saja, bobot biarkan 0 dulu
         Kriteria::create([
             'nama' => $request->nama,
             'prioritas' => $request->prioritas,
@@ -77,7 +73,6 @@ class KriteriaController extends Controller
             'nama' => $request->nama,
             'prioritas' => $request->prioritas,
             'jenis' => $request->jenis
-            // Bobot tidak diupdate manual, tetap pakai nilai lama sampai dihitung ulang
         ]);
 
         return redirect()->route('admin.kriteria.index')
@@ -91,12 +86,8 @@ class KriteriaController extends Controller
             ->with('success', 'Data kriteria dihapus. Silakan hitung ulang bobot.');
     }
 
-    /**
-     * Logic inti perhitungan ROC
-     */
     public function hitungBobot()
     {
-        // 1. Ambil semua kriteria diurutkan prioritas 1 sampai akhir
         $semuaKriteria = Kriteria::orderBy('prioritas', 'asc')->get();
         $totalKriteria = $semuaKriteria->count();
 
@@ -104,25 +95,17 @@ class KriteriaController extends Controller
             return back()->with('error', 'Belum ada data kriteria.');
         }
 
-        // 2. Loop untuk menghitung bobot tiap kriteria
-        // Rumus ROC: W_k = (1/K) * Sum(1/i) dari i=k sampai K
-
         foreach ($semuaKriteria as $index => $kriteria) {
-            // $index dimulai dari 0, tapi prioritas ranking (k) dimulai dari 1
-            // Sebenarnya $kriteria->prioritas sudah ada, tapi lebih aman pakai loop index + 1
-            // untuk memastikan urutan 1, 2, 3... teratur saat perhitungan matematikanya.
 
-            $rank = $index + 1; // Ini adalah 'k'
+            $rank = $index + 1;
             $sigma = 0;
 
-            // Loop Sigma (Sum)
             for ($i = $rank; $i <= $totalKriteria; $i++) {
                 $sigma += (1 / $i);
             }
 
             $bobotRoc = $sigma / $totalKriteria;
 
-            // 3. Update bobot ke database
             $kriteria->update(['bobot' => $bobotRoc]);
         }
 

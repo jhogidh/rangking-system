@@ -21,9 +21,9 @@ class WpController extends Controller
         $this->wpService = $wp;
     }
 
-    // (Gunakan logika prepareData yang SAMA dengan ManualController)
+
     private function prepareData(Request $request)
-    { /* ... Copy logic prepareData ... */
+    {
         $request->validate(['id_semester' => 'required|exists:semester,id', 'id_kelas' => 'nullable|exists:kelas,id']);
         $id_semester = $request->id_semester;
         $id_kelas = $request->id_kelas;

@@ -35,7 +35,6 @@
                                     <th>Nama Kriteria</th>
                                     <th>Bobot (ROC)</th>
                                     <th>Jenis</th>
-                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -44,22 +43,14 @@
                                         <td>
                                             <span class="badge badge-primary">{{ $k->prioritas }}</span>
                                         </td>
-                                        <td>{{ $k->nama_kriteria }}</td>
+                                        <td>{{ $k->nama }}</td>
                                         <td>
                                             {{ number_format($k->bobot, 4) }}
                                         </td>
                                         <td>
                                             {{ $k->jenis == 'benefit' ? 'Benefit' : 'Cost' }}
                                         </td>
-                                        <td>
-                                            <a href="{{ route('admin.kriteria.edit', $k->id) }}"
-                                                class="btn btn-warning btn-sm">Edit</a>
-                                            <form action="{{ route('admin.kriteria.destroy', $k->id) }}" method="POST"
-                                                class="d-inline" onsubmit="return confirm('Hapus?');">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                                            </form>
-                                        </td>
+
                                     </tr>
                                 @empty
                                     <tr>

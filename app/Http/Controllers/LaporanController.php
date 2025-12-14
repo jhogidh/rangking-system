@@ -10,14 +10,11 @@ class LaporanController extends Controller
 {
     public function index()
     {
-        // Tampilkan form untuk pilih semester
         $semester = Semester::all();
-        // return view('laporan.index', compact('semester'));
     }
 
     public function show(Request $request)
     {
-        // Tampilkan hasil ranking berdasarkan semester yang dipilih
         $id_semester = $request->id_semester;
 
         $hasilRanking = Ranking::whereHas('dataSiswaKelas', function ($query) use ($id_semester) {
@@ -26,14 +23,10 @@ class LaporanController extends Controller
             ->with('dataSiswaKelas.siswa', 'dataSiswaKelas.kelas')
             ->orderBy('ranking', 'asc')
             ->get();
-
-        // return view('laporan.show', compact('hasilRanking'));
     }
 
     public function detail($id_ranking)
     {
-        // Tampilkan detail skor per kriteria untuk satu siswa
         $ranking = Ranking::with('dataSiswaKelas.skorKriteria.kriteria')->find($id_ranking);
-        // return view('laporan.detail', compact('ranking'));
     }
 }

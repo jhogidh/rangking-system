@@ -61,6 +61,13 @@
         @if (Auth::user()->role === 'admin')
             <li class="nav-item nav-category">Perankingan SPK</li>
 
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.status-input.index') }}">
+                    <i class="icon-eye menu-icon"></i>
+                    <span class="menu-title">Cek Kelengkapan Data</span>
+                </a>
+            </li>
+
             <!-- 1. Hitung Manual -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.manual.index') }}">
@@ -72,7 +79,7 @@
             <!-- 2. Bobot ROC -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.kriteria.index') }}">
-                    <i class="icon-calculator menu-icon"></i>
+                    <i class="icon-command menu-icon"></i>
                     <span class="menu-title">2. Bobot Kriteria (ROC)</span>
                 </a>
             </li>
@@ -80,7 +87,7 @@
             <!-- 3. Hitung Borda -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.borda.index') }}">
-                    <i class="icon-graph menu-icon"></i>
+                    <i class="icon-bar-graph menu-icon"></i>
                     <span class="menu-title">3. Hitung Borda</span>
                 </a>
             </li>
@@ -88,7 +95,7 @@
             <!-- 4. Hitung WP -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.wp.index') }}">
-                    <i class="icon-graph menu-icon"></i>
+                    <i class="icon-pie-graph menu-icon"></i>
                     <span class="menu-title">4. Hitung WP</span>
                 </a>
             </li>
@@ -97,7 +104,7 @@
             <li class="nav-item">
                 <a class="nav-link" data-toggle="collapse" href="#laporan" aria-expanded="false"
                     aria-controls="laporan">
-                    <i class="icon-pie-chart menu-icon"></i>
+                    <i class="icon-file menu-icon"></i>
                     <span class="menu-title">5. Laporan Analisis</span>
                     <i class="menu-arrow"></i>
                 </a>
@@ -107,6 +114,8 @@
                                 href="{{ route('admin.analisis.pemeringkatan') }}">Hasil Pemeringkatan</a></li>
                         <li class="nav-item"> <a class="nav-link" href="{{ route('admin.analisis.pengujian') }}">Hasil
                                 Pengujian</a></li>
+                        <li class="nav-item"> <a class="nav-link"
+                                href="{{ route('admin.analisis.gabungan') }}">Rekapitulasi (3 Tahun)</a></li>
                     </ul>
                 </div>
             </li>

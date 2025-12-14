@@ -2,11 +2,38 @@
 
 @section('content')
     <div class="row">
+        <!-- RINGKASAN WAKTU WP -->
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hasil Perhitungan WP (Semua Langkah)</h4>
-                    <a href="{{ route('admin.wp.index') }}" class="btn btn-secondary btn-sm mb-3">Kembali ke Form</a>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="card-title mb-0">Statistik Waktu Eksekusi (Weighted Product)</h4>
+                        <a href="{{ route('admin.wp.index') }}" class="btn btn-outline-secondary btn-sm">Kembali</a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-center">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Tahap 1 (Normalisasi Bobot)</th>
+                                    <th>Tahap 2 (Vektor S)</th>
+                                    <th>Tahap 3 (Vektor V)</th>
+                                    <th>Tahap 4 (Ranking)</th>
+                                    <th class="bg-primary text-white">TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ number_format($timings['tahap_1'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_2'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_3'], 4) }} ms</td>
+                                    <td>{{ number_format($timings['tahap_4'], 4) }} ms</td>
+                                    <td class="bg-primary text-white font-weight-bold">
+                                        {{ number_format($timings['total'], 4) }} ms</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -21,7 +48,7 @@
                             <thead>
                                 <tr>
                                     @foreach ($criteria as $c)
-                                        <th>{{ $c->nama_kriteria }}</th>
+                                        <th>{{ $c->nama }}</th>
                                     @endforeach
                                 </tr>
                             </thead>
@@ -47,13 +74,16 @@
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
+                                    <th>No</th>
                                     <th>Siswa</th>
                                     <th>Nilai Vektor S</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php $i = 1; ?>
                                 @foreach ($steps['vector_s'] as $altId => $score)
                                     <tr>
+                                        <td><?= $i++ ?></td>
                                         <td>{{ $siswaMap[$altId] ?? 'N/A' }}</td>
                                         <td>{{ number_format($score, 5) }}</td>
                                     </tr>

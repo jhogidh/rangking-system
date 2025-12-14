@@ -10,21 +10,21 @@ class AdminUserSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat Admin
+        // 1. Buat Guru BK
         User::updateOrCreate(
-            ['email' => 'admin@admin.com'],
+            ['email' => 'bk@guru.com'],
             [
-                'name' => 'Administrator',
+                'name' => 'Guru BK',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
             ]
         );
 
-        // 2. Buat Guru (Wali Kelas)
+        // 2. Buat Admin (Sisi input)
         User::updateOrCreate(
-            ['email' => 'guru@guru.com'],
+            ['email' => 'admin@admin.com'],
             [
-                'name' => 'Guru',
+                'name' => 'Administrasi',
                 'password' => Hash::make('password'),
                 'role' => 'guru',
             ]
