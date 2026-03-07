@@ -5,7 +5,10 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hasil Pengujian Metode (Menu 5)</h4>
+                    <h4 class="card-title">Hasil Pengujian Metode</h4>
+                    <p class="card-description">
+                           Pengujian waktu proses perhitungan.
+                        </p>
                     <!-- Form Filter (sama seperti Pemeringkatan, copy paste jika perlu) -->
                     <form class="forms-sample" action="{{ route('admin.analisis.pengujian') }}" method="GET">
                         <!-- ... (Kode form sama dengan show_pemeringkatan.blade.php) ... -->
@@ -40,7 +43,7 @@
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-center">
-                                <button type="submit" class="btn btn-success btn-lg btn-block">Tampilkan</button>
+                                <button type="submit" class="btn btn-info btn-sm py-3 btn-block">Tampilkan</button>
                             </div>
                         </div>
                     </form>
@@ -49,38 +52,75 @@
         </div>
 
         @if ($filters['id_semester'])
-            <!-- TABEL AKURASI -->
             <div class="col-lg-6 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <div class="d-flex justify-content-between">
-                            <h4 class="card-title">Statistik Akurasi</h4>
-                            <form action="{{ route('admin.analisis.hitung.spearman') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="id_semester" value="{{ $filters['id_semester'] }}">
-                                <input type="hidden" name="id_kelas" value="{{ $filters['id_kelas'] }}">
-                                <button type="submit" class="btn btn-secondary btn-sm">Hitung Spearman</button>
-                            </form>
-                        </div>
+                        <h4 class="card-title">Akurasi Keseluruhan Kelas</h4>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Metode</th>
-                                        <th>Spearman (rho)</th>
+                                        <th>Kategori</th>
+                                        <th>Spearman WP</th>
+                                        <th>Spearman Borda</th>
+                                        <th>Jumlah Data</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if ($statistik && $statistik->count() > 0)
-                                        @foreach ($statistik as $stat)
+                                    @php $overallRows = $accuracyByScope['keseluruhan'] ?? []; @endphp
+                                    @if (count($overallRows) > 0)
+                                        @foreach ($overallRows as $row)
                                             <tr>
-                                                <td>{{ $stat->metode }}</td>
-                                                <td>{{ number_format($stat->spearman_rho, 5) }}</td>
+                                                <td>{{ $row['kategori_label'] }}</td>
+                                                <td>{{ is_null($row['spearman_wp']) ? '-' : number_format($row['spearman_wp'], 5) }}
+                                                </td>
+                                                <td>{{ is_null($row['spearman_borda']) ? '-' : number_format($row['spearman_borda'], 5) }}
+                                                </td>
+                                                <td>{{ $row['jumlah_manual'] }}</td>
                                             </tr>
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="2" class="text-center">Tidak ada data.</td>
+                                            <td colspan="4" class="text-center">Tidak ada data akurasi.</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Akurasi Top 3 (Berdasarkan Manual)</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Kategori</th>
+                                        <th>Spearman WP</th>
+                                        <th>Spearman Borda</th>
+                                        <th>Jumlah Data</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php $topRows = $accuracyByScope['top_3'] ?? []; @endphp
+                                    @if (count($topRows) > 0)
+                                        @foreach ($topRows as $row)
+                                            <tr>
+                                                <td>{{ $row['kategori_label'] }}</td>
+                                                <td>{{ is_null($row['spearman_wp']) ? '-' : number_format($row['spearman_wp'], 5) }}
+                                                </td>
+                                                <td>{{ is_null($row['spearman_borda']) ? '-' : number_format($row['spearman_borda'], 5) }}
+                                                </td>
+                                                <td>{{ $row['jumlah_manual'] }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="4" class="text-center">Tidak ada data akurasi top 3.</td>
                                         </tr>
                                     @endif
                                 </tbody>
@@ -91,7 +131,7 @@
             </div>
 
             <!-- TABEL KECEPATAN -->
-            <div class="col-lg-6 grid-margin stretch-card">
+            <div class="col-lg-12 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Statistik Kecepatan (ms)</h4>
@@ -106,10 +146,12 @@
                                 <tbody>
                                     @if ($statistik && $statistik->count() > 0)
                                         @foreach ($statistik as $stat)
+                                        @if($stat->metode != "Manual")
                                             <tr>
                                                 <td>{{ $stat->metode }}</td>
                                                 <td><strong>{{ number_format($stat->waktu_total, 2) }}</strong></td>
                                             </tr>
+                                        @endif
                                         @endforeach
                                     @else
                                         <tr>

@@ -24,19 +24,56 @@ class ManualService
         $timer->stopStage('tahap_1');
 
         // --- TAHAP 2: Perangkingan ---
-        $timer->startStage();
-        arsort($finalScores);
-        $timer->stopStage('tahap_2');
+$timer->startStage();
 
-        $timings = $timer->timings;
-        $timings['total'] = $timer->getTotalTime();
+// Ubah jadi array detail dulu
+$detailedScores = [];
 
-        return [
-            'steps' => [
-                'final_scores' => $finalScores
-            ],
-            'values' => $finalScores,
-            'timings' => $timings,
-        ];
+foreach ($finalScores as $altId => $score) {
+    $detailedScores[] = [
+        'id' => $altId,
+        'total' => $score,
+        'values' => $alternatives[$altId]
+    ];
+}
+
+usort($detailedScores, function ($a, $b) use ($criteria) {
+
+    // 1️⃣ Bandingkan total dulu
+    if ($a['total'] != $b['total']) {
+        return $b['total'] <=> $a['total'];
+    }
+
+    // 2️⃣ Jika sama → bandingkan per kriteria
+    foreach ($criteria as $c) {
+        $aVal = $a['values'][$c->id] ?? 0;
+        $bVal = $b['values'][$c->id] ?? 0;
+
+        if ($aVal != $bVal) {
+            return $bVal <=> $aVal;
+        }
+    }
+
+    return 0;
+});
+
+// Kembalikan ke format awal (id => total)
+$finalScores = [];
+foreach ($detailedScores as $item) {
+    $finalScores[$item['id']] = $item['total'];
+}
+
+$timer->stopStage('tahap_2');
+
+$timings = $timer->timings;
+$timings['total'] = $timer->getTotalTime();
+
+return [
+    'steps' => [
+        'final_scores' => $finalScores
+    ],
+    'values' => $finalScores,
+    'timings' => $timings,
+];
     }
 }

@@ -7,7 +7,8 @@
                 <div class="card-body">
                     <h4 class="card-title">Data Semester & Tahun Ajaran</h4>
                     <p class="card-description">
-                        Daftar semester beserta tahun ajarannya.
+                        Berikut adalah daftar <span class="text-success font-weight-bold"> Semester dan Tahun Ajaran </span> yang terdaftar di
+                        sistem.
                     </p>
                     <a href="{{ route('proses.semester.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Semester Baru

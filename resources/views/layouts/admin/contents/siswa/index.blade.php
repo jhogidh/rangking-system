@@ -2,16 +2,14 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-6 grid-margin stretch-card">
+        <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Data Siswa</h4>
                     <p class="card-description">
-                        Berikut adalah daftar <code>siswa</code> yang terdaftar di sistem.
+                        Berikut adalah daftar <span class="text-success font-weight-bold"> Siswa </span> yang terdaftar di
+                        sistem.
                     </p>
-                    {{-- <a href="{{ route('proses.siswa.create') }}" class="btn btn-info btn-sm mb-3">
-                        Tambah Siswa Baru
-                    </a> --}}
 
                     @if (session('success'))
                         <div class="alert alert-success" role="alert">
@@ -31,9 +29,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!--
-                                                                                  Loop data $siswa dari controller.
-                                                                                -->
+                                <!-- Loop data $siswa dari controller. -->
                                 @forelse($siswa as $key => $s)
                                     <tr>
                                         <td>{{ $siswa->firstItem() + $key }}</td>

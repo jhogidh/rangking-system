@@ -7,7 +7,7 @@
                 <div class="card-body">
                     <h4 class="card-title">Status Input Data Nilai (36 Dataset)</h4>
                     <p class="card-description">
-                        Monitoring kelengkapan data nilai siswa dari Tahun Ajaran 2022-2025.
+                        Monitoring kelengkapan data nilai siswa dari Tahun Ajaran 2022-2024.
                     </p>
 
                     <div class="table-responsive">
@@ -58,7 +58,7 @@
                     <div class="mt-4">
                         <h6>Keterangan:</h6>
                         <ul class="list-unstyled">
-                            <li><i class="ti-check text-success mr-2"></i> Data Nilai SUDAH diimport (Siap Hitung)</li>
+                            <li><i class="ti-check text-success mr-2"></i> Data Nilai SUDAH diimport</li>
                             <li><i class="ti-close text-danger mr-2"></i> Data Nilai BELUM diimport</li>
                         </ul>
                     </div>

@@ -21,6 +21,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\StatusInputController;
 use App\Http\Controllers\WpController;
+
 // --- Untuk Rute Tes ---
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -65,12 +66,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('hitung-manual', [ManualController::class, 'index'])->name('manual.index');
         Route::post('hitung-manual', [ManualController::class, 'calculate'])->name('manual.calculate');
+        Route::post('hitung-manual-akademik', [ManualController::class, 'calculateAkademik'])->name('manual.akademik');
+        Route::post('hitung-manual-nonakademik', [ManualController::class, 'calculateNonAkademik'])->name('manual.nonakademik');
 
         Route::get('hitung-borda', [BordaController::class, 'index'])->name('borda.index');
         Route::post('hitung-borda', [BordaController::class, 'calculate'])->name('borda.calculate');
+        Route::post('hitung-borda-akademik', [BordaController::class, 'calculateAkademik'])->name('borda.akademik');
+        Route::post('hitung-borda-nonakademik', [BordaController::class, 'calculateNonAkademik'])->name('borda.nonakademik');
+
 
         Route::get('hitung-wp', [WpController::class, 'index'])->name('wp.index');
         Route::post('hitung-wp', [WpController::class, 'calculate'])->name('wp.calculate');
+        Route::post('hitung-wp-akademik', [WpController::class, 'calculateAkademik'])->name('wp.akademik');
+        Route::post('hitung-wp-nonakademik', [WpController::class, 'calculateNonAkademik'])->name('wp.nonakademik');
+
 
         Route::get('analisis/pemeringkatan', [AnalisisController::class, 'showPemeringkatan'])->name('analisis.pemeringkatan');
         Route::get('analisis/pengujian', [AnalisisController::class, 'showPengujian'])->name('analisis.pengujian');
@@ -107,6 +116,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('penempatan-kelas', [PenempatanKelasController::class, 'index'])->name('penempatan.index');
         Route::post('penempatan-kelas', [PenempatanKelasController::class, 'store'])->name('penempatan.store');
         Route::delete('penempatan-kelas/{id}', [PenempatanKelasController::class, 'destroy'])->name('penempatan.destroy');
+        Route::get('status-input', [StatusInputController::class, 'index'])->name('status-input.index');
 
         // Import Nilai
         Route::get('input-nilai', [InputNilaiController::class, 'index'])->name('input-nilai.index');

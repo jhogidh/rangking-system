@@ -9,7 +9,7 @@
     <meta name="author" content="">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
 
-    <title>Grad School HTML5 Template</title>
+    <title>Projek Skripsi</title>
 
     <!-- Bootstrap core CSS -->
     <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -31,26 +31,12 @@ https://templatemo.com/tm-557-grad-school
 <body>
     <!--header-->
     <header class="main-header clearfix" role="header">
-        <div class="logo">
-            <a href="#"><em>Profil</em> Sekolah</a>
-        </div>
-        <a href="#menu" class="menu-link"><i class="fa fa-bars"></i></a>
-        {{-- <nav id="menu" class="main-nav" role="navigation">
-            <ul class="main-menu">
-                <li><a href="#section1">Home</a></li>
-                <li class="has-submenu"><a href="#section2">About Us</a>
-                    <ul class="sub-menu">
-                        <li><a href="#section2">Who we are?</a></li>
-                        <li><a href="#section3">What we do?</a></li>
-                        <li><a href="#section3">How it works?</a></li>
-                        <li><a href="https://templatemo.com/about" rel="sponsored" class="external">External URL</a>
-                        </li>
-                    </ul>
-                </li>
-                <li><a href="#section4">Courses</a></li>
-                <!-- <li><a href="#section5">Video</a></li> -->
-                <li><a href="#section6">Contact</a></li>
-                <li><a href="https://templatemo.com" class="external">External</a></li>
-            </ul>
-        </nav> --}}
-    </header>
+    <div class="logo">
+           <img src="assets/images/logo-mi.png" alt="Logo MI" class="logo-img" style="width: 50px">
+            <span class="logo-text">
+                <a href="#">&nbsp;<em>MI</em> Miftahul Ulum</a>
+            </span>
+        </a>
+    </div>
+</header>
+

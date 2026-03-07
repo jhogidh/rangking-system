@@ -2,12 +2,13 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-6 grid-margin stretch-card">
+        <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Edit Data Kriteria</h4>
+                    <h4 class="card-title">Edit Data Kriteria & Pembobotan (ROC)</h4>
                     <p class="card-description">
-                        Ubah prioritas atau nama kriteria di bawah ini.
+                        Ubah data <span
+                            class="text-success font-weight-bold">Nama Kriteria atau Prioritas</span> di bawah ini.
                     </p>
 
                     <form class="forms-sample" action="{{ route('admin.kriteria.update', $kriteria->id) }}" method="POST">
@@ -63,8 +64,8 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary mr-2">Update</button>
-                        <a href="{{ route('admin.kriteria.index') }}" class="btn btn-light">
+                        <button type="submit" class="btn btn-info mr-2">Update</button>
+                        <a href="{{ route('admin.kriteria.index') }}" class="btn btn-warning">
                             Batal
                         </a>
                     </form>

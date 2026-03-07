@@ -10,14 +10,18 @@ use App\Models\Ranking;
 use App\Models\Semester;
 use App\Models\Kelas;
 use App\Services\SPK\AnalysisService;
+use App\Services\SPK\RankingComparisonService;
+use Illuminate\Support\Collection;
 
 class AnalisisController extends Controller
 {
     protected $analysisService;
+    protected $rankingComparisonService;
 
-    public function __construct(AnalysisService $analysis)
+    public function __construct(AnalysisService $analysis, RankingComparisonService $rankingComparisonService)
     {
         $this->analysisService = $analysis;
+        $this->rankingComparisonService = $rankingComparisonService;
     }
 
     private function getFilters(Request $request)
@@ -44,24 +48,20 @@ class AnalisisController extends Controller
     {
         $filters = $this->getFilters($request);
         $dropdowns = $this->getDropdownData();
-        $rankings = null;
+        $rankingsByCategory = null;
+        $categoryLabels = $this->rankingComparisonService->getCategoryLabels();
 
         if ($filters['id_semester']) {
-            $rankingQuery = Ranking::query()
-                ->with('dataSiswaKelas.siswa')
-                ->whereHas('dataSiswaKelas', function ($q_siswa) use ($filters) {
-                    $q_siswa->where('id_semester', $filters['id_semester']);
-                    if ($filters['id_kelas']) $q_siswa->where('id_kelas', $filters['id_kelas']);
-                });
-
-            $rankings = $rankingQuery
-                ->orderBy('metode', 'asc')
-                ->orderBy('ranking', 'asc')
-                ->get()
-                ->groupBy('dataSiswaKelas.siswa.nama');
+            $rankings = $this->getFilteredRankings($filters);
+            $rankingsByCategory = $this->buildRankingsByCategory($rankings, array_keys($categoryLabels));
         }
 
-        return view('layouts.admin.contents.analisis.show_pemeringkatan', compact('rankings', 'dropdowns', 'filters'));
+        return view('layouts.admin.contents.analisis.show_pemeringkatan', compact(
+            'rankingsByCategory',
+            'categoryLabels',
+            'dropdowns',
+            'filters'
+        ));
     }
 
     public function showPengujian(Request $request)
@@ -69,6 +69,7 @@ class AnalisisController extends Controller
         $filters = $this->getFilters($request);
         $dropdowns = $this->getDropdownData();
         $statistik = null;
+        $accuracyByScope = null;
 
         if ($filters['id_semester']) {
             $statistikQuery = AnalisisPerbandingan::where('id_semester', $filters['id_semester']);
@@ -77,9 +78,17 @@ class AnalisisController extends Controller
             else $statistikQuery->whereNull('id_kelas');
 
             $statistik = $statistikQuery->orderBy('metode', 'asc')->get();
+
+            $rankings = $this->getFilteredRankings($filters);
+            $accuracyByScope = $this->rankingComparisonService->calculateAccuracyByScope($rankings);
         }
 
-        return view('layouts.admin.contents.analisis.show_pengujian', compact('statistik', 'dropdowns', 'filters'));
+        return view('layouts.admin.contents.analisis.show_pengujian', compact(
+            'statistik',
+            'accuracyByScope',
+            'dropdowns',
+            'filters'
+        ));
     }
 
     public function hitungSpearman(Request $request)
@@ -89,6 +98,9 @@ class AnalisisController extends Controller
         $id_kelas = $request->id_kelas;
 
         $rankingsDB = Ranking::query()
+            ->where(function ($q) {
+                $q->where('kategori', Ranking::CATEGORY_ALL)->orWhereNull('kategori');
+            })
             ->whereHas('dataSiswaKelas', function ($q_siswa) use ($id_semester, $id_kelas) {
                 $q_siswa->where('id_semester', $id_semester);
                 if ($id_kelas) $q_siswa->where('id_kelas', $id_kelas);
@@ -109,5 +121,57 @@ class AnalisisController extends Controller
         AnalisisPerbandingan::updateOrCreate(['id_semester' => $id_semester, 'id_kelas' => $id_kelas, 'metode' => 'Borda'], ['spearman_rho' => $spearman_borda]);
 
         return redirect()->back()->with('success', 'Perhitungan Akurasi (Spearman) Selesai!');
+    }
+
+    private function getFilteredRankings(array $filters): Collection
+    {
+        return Ranking::query()
+            ->with(['dataSiswaKelas.siswa', 'dataSiswaKelas.kelas'])
+            ->whereHas('dataSiswaKelas', function ($q_siswa) use ($filters) {
+                $q_siswa->where('id_semester', $filters['id_semester']);
+                if ($filters['id_kelas']) {
+                    $q_siswa->where('id_kelas', $filters['id_kelas']);
+                }
+            })
+            ->orderBy('metode', 'asc')
+            ->orderBy('ranking', 'asc')
+            ->get();
+    }
+
+    private function buildRankingsByCategory(Collection $rankings, array $categories): array
+    {
+        $result = [];
+        foreach ($categories as $categoryKey) {
+            $rows = $rankings
+                ->filter(fn($row) => $this->rankingComparisonService->normalizeCategory($row->kategori ?? null) === $categoryKey)
+                ->groupBy('id_data_siswa_kelas')
+                ->map(function ($items) {
+                    $first = $items->first();
+                    $kelas = $first->dataSiswaKelas->kelas ?? null;
+                    return [
+                        'id_data_siswa_kelas' => $first->id_data_siswa_kelas,
+                        'nama_siswa' => $first->dataSiswaKelas->siswa->nama ?? 'N/A',
+                        'kelas' => $kelas ? trim(($kelas->nama ?? '') . ' ' . ($kelas->sub ?? '')) : '-',
+                        'manual' => optional($items->firstWhere('metode', 'Manual'))->ranking,
+                        'wp' => optional($items->firstWhere('metode', 'WP'))->ranking,
+                        'borda' => optional($items->firstWhere('metode', 'Borda'))->ranking,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            usort($rows, function ($a, $b) {
+                $rankA = $a['manual'] ?? PHP_INT_MAX;
+                $rankB = $b['manual'] ?? PHP_INT_MAX;
+                if ($rankA !== $rankB) {
+                    return $rankA <=> $rankB;
+                }
+                return strcasecmp($a['nama_siswa'], $b['nama_siswa']);
+            });
+
+            $result[$categoryKey] = collect($rows);
+        }
+
+        return $result;
     }
 }

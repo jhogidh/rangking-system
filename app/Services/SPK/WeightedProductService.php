@@ -17,7 +17,7 @@ class WeightedProductService
             'vector_v' => [],
         ];
 
-        // --- TAHAP 1: Normalisasi Bobot ---
+        // --- TAHAP 1: Normalisasi Bobot (bobot itu/jumlah bobot)---
         $timer->startStage();
         $totalBobot = $criteria->sum('bobot');
         $normalizedWeights = $criteria->mapWithKeys(
@@ -27,7 +27,7 @@ class WeightedProductService
         $steps['normalized_weights'] = $normalizedWeights;
         $timer->stopStage('tahap_1');
 
-        // --- TAHAP 2: Menghitung Vektor S ---
+        // --- TAHAP 2: Menghitung Vektor S (setiap alternatif pangkat bobot) ---
         $timer->startStage();
         foreach ($alternatives as $altId => $values) {
             $s = 1;

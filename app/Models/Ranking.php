@@ -10,6 +10,10 @@ class Ranking extends Model
     use HasFactory;
     protected $table = 'ranking';
 
+    public const CATEGORY_ALL = 'semua';
+    public const CATEGORY_AKADEMIK = 'akademik';
+    public const CATEGORY_NON_AKADEMIK = 'nonakademik';
+
     /**
      * Atribut yang dapat diisi secara massal.
      *
@@ -18,6 +22,7 @@ class Ranking extends Model
     protected $fillable = [
         'id_data_siswa_kelas', // <-- TAMBAHKAN BARIS INI
         'metode',
+        'kategori',
         'hasil_alternatif',
         'ranking',
     ];

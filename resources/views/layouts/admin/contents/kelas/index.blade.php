@@ -2,12 +2,13 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-6 grid-margin stretch-card">
+        <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Data Kelas</h4>
                     <p class="card-description">
-                        Berikut adalah daftar <code>kelas</code> yang terdaftar di sistem.
+                        Berikut adalah daftar <span
+                            class="text-success font-weight-bold">Kelas</span> yang terdaftar di sistem.
                     </p>
                     <a href="{{ route('proses.kelas.create') }}" class="btn btn-info btn-sm mb-3">
                         Tambah Kelas Baru

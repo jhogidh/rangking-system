@@ -14,6 +14,10 @@
         <!-- === KHUSUS GURU: Master Data === -->
         @if (Auth::user()->role === 'guru')
             <li class="nav-item">
+                <a class="nav-link" href="{{ route('proses.status-input.index') }}"><i class="icon-eye menu-icon">
+                    </i><span class="menu-title">Cek Kelengkapan Data</span></a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" data-toggle="collapse" href="#master-data" aria-expanded="false"
                     aria-controls="master-data">
                     <i class="icon-folder menu-icon"></i>
@@ -48,10 +52,11 @@
                 </a>
                 <div class="collapse" id="proses-input">
                     <ul class="nav flex-column sub-menu">
-                        {{-- <li class="nav-item"> <a class="nav-link"
-                                href="{{ route('proses.penempatan.index') }}">Penempatan Kelas</a></li> --}}
+                        <!-- PERBAIKAN: Gunakan route 'proses.'
+                        <li class="nav-item"> <a class="nav-link" href="{{ route('proses.penempatan.index') }}">Penempatan
+                                Kelas</a></li> -->
                         <li class="nav-item"> <a class="nav-link" href="{{ route('proses.input-nilai.index') }}">Import
-                                Nilai (Excel)</a></li>
+                                Nilai</a></li>
                     </ul>
                 </div>
             </li>
@@ -59,36 +64,27 @@
 
         <!-- === KHUSUS ADMIN: SPK (5 Menu) === -->
         @if (Auth::user()->role === 'admin')
-            <li class="nav-item nav-category">Perankingan SPK</li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.status-input.index') }}">
-                    <i class="icon-eye menu-icon"></i>
-                    <span class="menu-title">Cek Kelengkapan Data</span>
-                </a>
-            </li>
-
-            <!-- 1. Hitung Manual -->
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.manual.index') }}">
-                    <i class="icon-paper menu-icon"></i>
-                    <span class="menu-title">1. Hitung Manual (SAW)</span>
-                </a>
-            </li>
-
-            <!-- 2. Bobot ROC -->
+            <!-- 1. Bobot ROC -->
             <li class="nav-item">
                 <a class="nav-link" href="{{ route('admin.kriteria.index') }}">
                     <i class="icon-command menu-icon"></i>
-                    <span class="menu-title">2. Bobot Kriteria (ROC)</span>
+                    <span class="menu-title">1. Hitung Kriteria</span>
                 </a>
             </li>
 
-            <!-- 3. Hitung Borda -->
+            <!-- 2. Cek Kelengkapan Data -->
             <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.borda.index') }}">
-                    <i class="icon-bar-graph menu-icon"></i>
-                    <span class="menu-title">3. Hitung Borda</span>
+                <a class="nav-link" href="{{ route('admin.status-input.index') }}">
+                    <i class="icon-eye menu-icon"></i>
+                    <span class="menu-title">2. Cek Kelengkapan Data</span>
+                </a>
+            </li>
+
+            <!-- 3. Hitung Manual -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.manual.index') }}">
+                    <i class="icon-paper menu-icon"></i>
+                    <span class="menu-title">3. Hitung Manual</span>
                 </a>
             </li>
 
@@ -100,12 +96,21 @@
                 </a>
             </li>
 
+
+            <!-- 4. Hitung Borda -->
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('admin.borda.index') }}">
+                    <i class="icon-bar-graph menu-icon"></i>
+                    <span class="menu-title">5. Hitung Borda</span>
+                </a>
+            </li>
+
             <!-- 5. Laporan Analisis -->
             <li class="nav-item">
                 <a class="nav-link" data-toggle="collapse" href="#laporan" aria-expanded="false"
                     aria-controls="laporan">
                     <i class="icon-file menu-icon"></i>
-                    <span class="menu-title">5. Laporan Analisis</span>
+                    <span class="menu-title">6. Laporan Analisis</span>
                     <i class="menu-arrow"></i>
                 </a>
                 <div class="collapse" id="laporan">

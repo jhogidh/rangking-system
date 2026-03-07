@@ -2,10 +2,14 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-6 grid-margin stretch-card">
+        <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Edit Semester</h4>
+                    <p class="card-description">
+                        Ubah data <span
+                            class="text-success font-weight-bold">Semester</span> di bawah ini.
+                    </p>
                     <form class="forms-sample" action="{{ route('proses.semester.update', $semester->id) }}" method="POST">
                         @csrf @method('PUT')
 
@@ -30,8 +34,8 @@
                         </div>
 
 
-                        <button type="submit" class="btn btn-primary mr-2">Update</button>
-                        <a href="{{ route('proses.semester.index') }}" class="btn btn-light">Batal</a>
+                        <button type="submit" class="btn btn-info mr-2">Update</button>
+                        <a href="{{ route('proses.semester.index') }}" class="btn btn-warning">Batal</a>
                     </form>
                 </div>
             </div>

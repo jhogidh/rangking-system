@@ -5,9 +5,10 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hasil Pemeringkatan (Menu 5)</h4>
-                    <p class="card-description">Pilih <code>Semester</code> dan <code>Kelas</code> untuk menampilkan hasil
-                        perbandingan ranking.</p>
+                    <h4 class="card-title">Hasil Pemeringkatan</h4>
+                    <p class="card-description">
+                            Penggabungan hasil peringkat antara manual, Metode WP, dan Metode Borda. 
+                        </p>
 
                     <form class="forms-sample" action="{{ route('admin.analisis.pemeringkatan') }}" method="GET">
                         <div class="row">
@@ -41,7 +42,7 @@
                                 </div>
                             </div>
                             <div class="col-md-2 d-flex align-items-center">
-                                <button type="submit" class="btn btn-success btn-lg btn-block">Tampilkan</button>
+                                <button type="submit" class="btn btn-info btn-sm py-3 btn-block">Tampilkan</button>
                             </div>
                         </div>
                     </form>
@@ -50,45 +51,54 @@
         </div>
 
         @if ($filters['id_semester'])
-            <div class="col-lg-12 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
-                        <h4 class="card-title">Perbandingan Hasil Ranking</h4>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Nama Siswa</th>
-                                        <th>Rank Manual</th>
-                                        <th>Rank WP</th>
-                                        <th>Rank Borda</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @if ($rankings && $rankings->count() > 0)
-                                        @foreach ($rankings as $namaSiswa => $hasilSiswa)
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $namaSiswa }}</td>
-                                                <td>{{ $hasilSiswa->firstWhere('metode', 'Manual')->ranking ?? 'N/A' }}
-                                                </td>
-                                                <td>{{ $hasilSiswa->firstWhere('metode', 'WP')->ranking ?? 'N/A' }}</td>
-                                                <td>{{ $hasilSiswa->firstWhere('metode', 'Borda')->ranking ?? 'N/A' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    @else
+            @foreach ($categoryLabels as $categoryKey => $categoryLabel)
+                <div class="col-lg-12 grid-margin stretch-card">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Perbandingan Hasil Ranking - {{ $categoryLabel }}</h4>
+                            <p class="card-description mb-3">
+                                Data diurutkan berdasarkan ranking manual (kategori {{ strtolower($categoryLabel) }}).
+                            </p>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
                                         <tr>
-                                            <td colspan="5" class="text-center">Tidak ada data ranking. (Sudah dihitung?)
-                                            </td>
+                                            <th>No</th>
+                                            <th>Nama Siswa</th>
+                                            <th>Kelas</th>
+                                            <th>Rank Manual</th>
+                                            <th>Rank WP</th>
+                                            <th>Rank Borda</th>
                                         </tr>
-                                    @endif
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $rows = $rankingsByCategory[$categoryKey] ?? collect();
+                                        @endphp
+                                        @if ($rows->count() > 0)
+                                            @foreach ($rows as $row)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $row['nama_siswa'] }}</td>
+                                                    <td>{{ $row['kelas'] }}</td>
+                                                    <td>{{ $row['manual'] ?? 'N/A' }}</td>
+                                                    <td>{{ $row['wp'] ?? 'N/A' }}</td>
+                                                    <td>{{ $row['borda'] ?? 'N/A' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="6" class="text-center">Tidak ada data ranking kategori ini.
+                                                    (Sudah dihitung?)</td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            @endforeach
         @endif
     </div>
 @endsection

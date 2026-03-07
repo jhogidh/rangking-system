@@ -19,6 +19,7 @@ use App\Services\SPK\WeightedProductService;
 use App\Services\SPK\BordaService;
 use App\Services\SPK\ManualService;
 use App\Services\SPK\AnalysisService;
+use App\Support\RankingHelper;
 
 class PerangkinganController extends Controller
 {
@@ -97,16 +98,19 @@ class PerangkinganController extends Controller
         $manualResult = $this->manualService->calculate($alternatives, $criteria);
 
         $processedSiswaIds = array_keys($alternatives);
-        Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)->delete();
+        Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)
+            ->where('kategori', Ranking::CATEGORY_ALL)
+            ->delete();
 
         $saveRanking = function ($result, $metode) {
-            $rank = 1;
+            $ranks = RankingHelper::denseRanks($result['values']);
             foreach ($result['values'] as $id_data_siswa_kelas => $nilai_alternatif) {
                 Ranking::create([
                     'id_data_siswa_kelas' => $id_data_siswa_kelas,
                     'metode' => $metode,
+                    'kategori' => Ranking::CATEGORY_ALL,
                     'hasil_alternatif' => $nilai_alternatif,
-                    'ranking' => $rank++,
+                    'ranking' => $ranks[$id_data_siswa_kelas],
                 ]);
             }
         };
@@ -116,9 +120,9 @@ class PerangkinganController extends Controller
         $saveRanking($manualResult, 'Manual');
 
 
-        $manualRanks = array_map(fn($r) => $r + 1, array_flip(array_keys($manualResult['values'])));
-        $wpRanks = array_map(fn($r) => $r + 1, array_flip(array_keys($wpResult['values'])));
-        $bordaRanks = array_map(fn($r) => $r + 1, array_flip(array_keys($bordaResult['values'])));
+        $manualRanks = RankingHelper::denseRanks($manualResult['values']);
+        $wpRanks = RankingHelper::denseRanks($wpResult['values']);
+        $bordaRanks = RankingHelper::denseRanks($bordaResult['values']);
 
         $spearman_wp = $this->analysisService->calculateSpearman($manualRanks, $wpRanks);
         $spearman_borda = $this->analysisService->calculateSpearman($manualRanks, $bordaRanks);

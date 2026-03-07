@@ -5,9 +5,9 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hitung Manual / SAW (Menu 1)</h4>
+                    <h4 class="card-title">Hitung Manual</h4>
                     <p class="card-description">
-                        Metode penjumlahan sederhana nilai kriteria.
+                        Data manual didapat dari data yang telah diupload oleh Admin yang berisi 5 kriteria yakni nilai akademik, nilai sikap, nilai prestasi, nilai absensi, dan nilai ekstrakurikuler.
                     </p>
                     @if (session('success'))
                         <div class="alert alert-success">{{ session('success') }}</div>
@@ -43,11 +43,24 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    <small class="form-text text-muted">Kosongkan untuk menghitung seluruh kelas pada
+                                        semester terpilih.</small>
                                 </div>
                             </div>
-                            <div class="col-md-2 d-flex align-items-center">
-                                <button type="submit" class="btn btn-secondary btn-lg btn-block">Hitung Manual</button>
-                            </div>
+                        </div>
+
+                        <div class="text-left mt-3">
+                            <button formaction="{{ route('admin.manual.calculate') }}" type="submit" class="btn btn-info">
+                                Manual Semua
+                            </button>
+                            <button formaction="{{ route('admin.manual.akademik') }}" type="submit"
+                                class="btn btn-primary">
+                                Manual Akademik
+                            </button>
+                            <button formaction="{{ route('admin.manual.nonakademik') }}" type="submit"
+                                class="btn btn-success">
+                                Manual Non Akademik
+                            </button>
                         </div>
                     </form>
                 </div>

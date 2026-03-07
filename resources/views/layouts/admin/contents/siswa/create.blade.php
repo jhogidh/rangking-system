@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-6 grid-margin stretch-card">
+        <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Tambah Data Siswa Baru</h4>
@@ -10,10 +10,8 @@
                         Masukkan data siswa baru di bawah ini.
                     </p>
 
-
                     <form class="forms-sample" action="{{ route('admin.siswa.store') }}" method="POST">
                         @csrf
-
 
                         <div class="form-group">
                             <label for="kode">Kode Siswa</label>
@@ -40,10 +38,9 @@
                         </div>
 
 
+                        <button type="submit" class="btn btn-info mr-2">Submit</button>
 
-                        <button type="submit" class="btn btn-primary mr-2">Submit</button>
-
-                        <a href="{{ route('admin.siswa.index') }}" class="btn btn-light">
+                        <a href="{{ route('admin.siswa.index') }}" class="btn btn-warning">
                             Cancel
                         </a>
                     </form>

@@ -2,9 +2,10 @@
 
 @section('content')
     <div class="row">
-        <!-- KARTU RINGKASAN WAKTU -->
+         <!-- KARTU RINGKASAN WAKTU -->
+        <!--
         <div class="col-lg-12 grid-margin stretch-card">
-            <div class="card bg-secondary text-white"> <!-- Ganti warna agar beda -->
+            <div class="card bg-secondary text-white"> 
                 <div class="card-body">
                     <h4 class="card-title text-white">Statistik Waktu Eksekusi (Manual)</h4>
                     <div class="row text-center">
@@ -25,12 +26,13 @@
                         Form</a>
                 </div>
             </div>
-        </div>
+        </div> -->
+
 
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Hasil Perhitungan Manual (SAW)</h4>
+                    <h4 class="card-title">Hasil Manual - {{ $kategoriLabel ?? 'Semua Kriteria' }}</h4>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -41,16 +43,17 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @php $rank = 1; @endphp
                                 @foreach ($steps['final_scores'] as $altId => $score)
                                     <tr>
-                                        <td>{{ $rank++ }}</td>
+                                        <td>{{ $ranks[$altId] ?? '-' }}</td>
                                         <td>{{ $siswaMap[$altId] ?? 'N/A' }}</td>
                                         <td>{{ number_format($score, 2) }}</td>
                                     </tr>
                                 @endforeach
                             </tbody>
                         </table>
+                        <a href="{{ route('admin.manual.index') }}" class="btn btn-info btn-lg">Kembali ke
+                        Form</a>
                     </div>
                 </div>
             </div>

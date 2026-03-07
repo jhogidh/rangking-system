@@ -72,7 +72,7 @@
         </div>
 
         <!-- TABEL 2: STATISTIK AKURASI (SPEARMAN) -->
-        <div class="col-lg-6 grid-margin stretch-card">
+       <!--  <div class="col-lg-6 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Statistik Akurasi (vs Manual)</h4>
@@ -103,7 +103,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- TABEL 3: STATISTIK KECEPATAN (WAKTU) -->
         <div class="col-lg-6 grid-margin stretch-card">
@@ -127,17 +127,20 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($statistik as $stat)
-                                    <tr>
-                                        <td>{{ $stat->metode }}</td>
-                                        <td>{{ number_format($stat->waktu_tahap_1, 4) }}</td>
-                                        <td>{{ number_format($stat->waktu_tahap_2, 4) }}</td>
-                                        <td>{{ number_format($stat->waktu_tahap_3, 4) }}</td>
-                                        <td>{{ number_format($stat->waktu_tahap_4, 4) }}</td>
-                                        <td>{{ number_format($stat->waktu_tahap_5, 4) }}</td>
-                                        <td><strong>{{ number_format($stat->waktu_total, 4) }}</strong></td>
-                                    </tr>
+                                @forelse($statistikKecepatan as $stat)
+                                    @if (in_array($stat->metode, ['WP', 'Borda']))
+                                        <tr>
+                                            <td>{{ $stat->metode }}</td>
+                                            <td>{{ number_format($stat->waktu_tahap_1, 4) }}</td>
+                                            <td>{{ number_format($stat->waktu_tahap_2, 4) }}</td>
+                                            <td>{{ number_format($stat->waktu_tahap_3, 4) }}</td>
+                                            <td>{{ number_format($stat->waktu_tahap_4, 4) }}</td>
+                                            <td>{{ number_format($stat->waktu_tahap_5, 4) }}</td>
+                                            <td><strong>{{ number_format($stat->waktu_total, 4) }}</strong></td>
+                                        </tr>
+                                    @endif
                                 @empty
+
                                     <tr>
                                         <td colspan="7" class="text-center">Tidak ada data.</td>
                                     </tr>

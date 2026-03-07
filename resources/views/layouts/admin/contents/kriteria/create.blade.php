@@ -2,12 +2,13 @@
 
 @section('content')
     <div class="row">
-        <div class="col-md-6 grid-margin stretch-card">
+        <div class="col-md-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Tambah Data Kriteria Baru</h4>
+                    <h4 class="card-title">Tambah Data Kriteria & Pembobotan (ROC) Baru</h4>
                     <p class="card-description">
-                        Masukkan data kriteria baru di bawah ini.
+                        Masukkan data <span
+                            class="text-success font-weight-bold">Nama Kriteria dan Prioritas Baru</span> di bawah ini.
                     </p>
 
                     <form class="forms-sample" action="{{ route('admin.kriteria.store') }}" method="POST">
@@ -57,8 +58,8 @@
                             @enderror
                         </div>
 
-                        <button type="submit" class="btn btn-primary mr-2">Simpan</button>
-                        <a href="{{ route('admin.kriteria.index') }}" class="btn btn-light">
+                        <button type="submit" class="btn btn-info mr-2">Simpan</button>
+                        <a href="{{ route('admin.kriteria.index') }}" class="btn btn-warning">
                             Batal
                         </a>
                     </form>

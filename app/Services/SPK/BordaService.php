@@ -3,6 +3,7 @@
 namespace App\Services\SPK;
 
 use App\Services\TimerService;
+use App\Support\RankingHelper;
 use Illuminate\Support\Collection;
 
 class BordaService
@@ -27,13 +28,9 @@ class BordaService
             foreach ($alternatives as $altId => $values) {
                 $tempScores[$altId] = $values[$c->id] ?? 0;
             }
-            arsort($tempScores);
+            arsort($tempScores); // --- rangking menurun ---
 
-            $rank = 1;
-            $ranks = [];
-            foreach ($tempScores as $altId => $score) {
-                $ranks[$altId] = $rank++;
-            }
+            $ranks = RankingHelper::denseRanks($tempScores);
             $steps['ranks_per_criteria'][$c->id] = $ranks;
         }
         $timer->stopStage('tahap_1');
@@ -45,6 +42,7 @@ class BordaService
                 $steps['borda_scores'][$altId][$kriteriaId] = $n - $rank;
             }
         }
+
         $timer->stopStage('tahap_2');
 
         // --- TAHAP 3: Bobot ROC (Kriteria) x Skor ---

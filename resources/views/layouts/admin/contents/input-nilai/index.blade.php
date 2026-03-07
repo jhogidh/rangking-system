@@ -6,12 +6,12 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <h4 class="card-title">Import Nilai Kriteria Siswa</h4>
+                    <h4 class="card-title">Import Nilai Siswa</h4>
                     <p class="card-description">
-                        Gunakan fitur ini untuk meng-upload nilai 5 kriteria (Nilai, Sikap, Absensi, Ekskul, Prestasi)
-                        langsung dari file Excel (Data Olah).<br>
-                        <strong>PENTING:</strong> Jika nama siswa di Excel belum ada di database, sistem akan **otomatis
-                        membuat siswa baru** dan **menempatkannya** di kelas ini.
+                        Gunakan fitur ini untuk meng-upload nilai 5 kriteria (Nilai, Sikap, Prestasi, Absensi, Ekskurikuler)
+                        langsung dari file Excel (CSV) yang telah di hitung oleh setiap wali kelas.<br>
+                        <strong>PENTING:</strong> Jika nama siswa di Excel belum ada di database, sistem akan otomatis
+                        membuat siswa baru.
                     </p>
 
                     <!-- Tampilkan pesan sukses/error -->
@@ -47,7 +47,7 @@
                                 <div class="form-group">
                                     <label for="id_semester">1. Pilih Semester</label>
                                     <select class="form-control" id="id_semester" name="id_semester" required>
-                                        <option value="">-- Pilih Semester Aktif --</option>
+                                        <option value="">-- Pilih Semester --</option>
                                         @foreach ($semesters as $semester)
                                             <!-- PERBAIKAN TAHUN AJARAN: Ambil langsung dari semester -->
                                             <option value="{{ $semester->id }}">
@@ -73,13 +73,13 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="file_import">3. Upload File Excel/CSV</label>
+                                    <label for="file_import">3. Upload File Excel (CSV)</label>
                                     <input type="file" name="file_import" class="form-control" id="file_import" required>
-                                    <small class="form-text text-muted">Gunakan file "Data Olah.csv"</small>
+                                    <small class="form-text text-muted">Gunakan file "Kelas 1 ganjil 2022-2023.csv"</small>
                                 </div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary btn-lg btn-block">
+                        <button type="submit" class="btn btn-info btn-lg btn-block">
                             <i class="ti-upload"></i> Import Data Nilai
                         </button>
                     </form>

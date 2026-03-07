@@ -26,13 +26,13 @@ class SiswaController extends Controller
         $request->validate([
             'nisn' => 'required|string|unique:siswa,nisn|max:100',
             'nama' => 'required|string|max:255',
+            'tahun_masuk' => 'required|string|max:9'
         ]);
 
         Siswa::create([
-            'nisn' => $request->kode || null,
+            'nisn' => $request->nisn,
             'nama' => $request->nama,
-            'tahun_masuk' => $request->tahun_masuk || null
-        ]);
+            'tahun_masuk' => $request->tahun_masuk]);
 
         return redirect()->route('proses.siswa.index')
             ->with('success', 'Data siswa berhasil ditambahkan.');
@@ -53,12 +53,7 @@ class SiswaController extends Controller
                 Rule::unique('siswa')->ignore($siswa->id),
                 'max:100'
             ],
-            'tahun_masuk' => [
-                'required',
-                'string',
-                Rule::unique('siswa')->ignore($siswa->id),
-                'max:100'
-            ]
+            'tahun_masuk' => 'required|string|max:9'
         ]);
 
         $siswa->update([

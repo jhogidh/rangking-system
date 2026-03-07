@@ -2,10 +2,14 @@
 
 @section('content')
     <div class="row">
-        <div class="col-lg-8 grid-margin stretch-card">
+        <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Data Kriteria & Pembobotan (ROC)</h4>
+                    <p class="card-description">
+                        Berikut adalah daftar <span class="text-success font-weight-bold"> Kriteria dan Bobot (ROC) </span> yang terdaftar di
+                        sistem.
+                    </p>
 
                     <div class="d-flex justify-content-between mb-3">
                         <a href="{{ route('admin.kriteria.create') }}" class="btn btn-info btn-sm">
@@ -71,7 +75,7 @@
                     </div>
 
                     <div class="mt-2 text-muted text-small">
-                        Total Bobot saat ini: <strong>{{ $kriteria->sum('bobot') }}</strong> (Harus mendekati 1)
+                        Total Bobot saat ini: <strong>{{ $kriteria->sum('bobot') }}</strong> (Harus samadengan 1)
                     </div>
 
                     <div class="mt-4">{{ $kriteria->links() }}</div>

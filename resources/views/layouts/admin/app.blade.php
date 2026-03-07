@@ -3,7 +3,6 @@
 <div class="container-scroller">
     @include('layouts.admin.partials.navbar')
     <div class="container-fluid page-body-wrapper">
-        @include('layouts.admin.partials.setting-panel')
         @include('layouts.admin.partials.sidebar')
         <div class="main-panel">
             <div class="content-wrapper">

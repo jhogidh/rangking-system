@@ -26,88 +26,135 @@ class NilaiKriteriaImport implements ToCollection, WithHeadingRow, WithCalculate
     {
         $this->id_semester = $id_semester;
         $this->id_kelas    = $id_kelas;
+        
+        try {
+            // Coba ambil data kriteria
+            $this->kriteriaMap = Kriteria::pluck('id', 'nama');
+        } catch (QueryException $e) {
+            // Jika terjadi error database (misal tabel/kolom tidak ada), tangkap di sini
+            // Error 1054 adalah "Unknown column"
+            if ($e->errorInfo[1] == 1054) {
+                throw new Exception("Gagal Membaca Database: Kolom 'nama_kriteria' tidak ditemukan di tabel kriteria. Mohon hubungi admin untuk memeriksa struktur database (migrasi).");
+            }
+            // Error 1146 adalah "Table doesn't exist"
+            if ($e->errorInfo[1] == 1146) {
+                 throw new Exception("Gagal Membaca Database: Tabel 'kriteria' belum dibuat. Mohon jalankan migrasi database terlebih dahulu.");
+            }
 
-        // Ambil ID dan Nama Kriteria untuk dicocokkan nanti
-        $this->kriteriaMap = Kriteria::pluck('id', 'nama');
+            // Error database lainnya
+            throw new Exception("Terjadi kesalahan database saat membaca Kriteria: " . $e->getMessage());
+        }
 
         if ($this->kriteriaMap->isEmpty()) {
-            throw new Exception("Import Gagal: Data Kriteria di database kosong.");
+            throw new Exception("Gagal: Data Kriteria di database masih kosong. Mohon Admin mengisi Master Data Kriteria terlebih dahulu.");
         }
     }
 
     public function collection(Collection $rows)
     {
-        foreach ($rows as $row) {
-            // 1. Validasi dasar: Lewati jika tidak ada nama
-            if (empty($row['nama'])) {
-                continue;
+        // Cek apakah file kosong
+        $firstRow = $rows->first();
+        if (!$firstRow) {
+             throw new Exception("Gagal: File yang Anda upload kosong atau tidak terbaca. Pastikan file berisi data.");
+        }
+
+        // Cek Header Wajib 'Nama'
+        // Kita cek keys dari baris pertama
+        $headerKeys = array_keys($firstRow->toArray());
+        
+        // Cari apakah ada key yang mengandung 'nama' (case-insensitive)
+        $hasNama = false;
+        foreach ($headerKeys as $key) {
+            if (strtolower($key) === 'nama') {
+                $hasNama = true;
+                break;
+            }
+        }
+
+        if (!$hasNama) {
+             throw new Exception("Format Dokumen Tidak Sesuai: Kolom 'Nama' tidak ditemukan di baris pertama. Pastikan Anda menggunakan file template yang benar.");
+        }
+
+        // Cek Header Wajib 'Nilai' (salah satu kriteria)
+        $hasNilai = false;
+        foreach ($headerKeys as $key) {
+            if (strtolower($key) === 'nilai') {
+                $hasNilai = true;
+                break;
+            }
+        }
+        
+        if (!$hasNilai) {
+             // Opsional: Cek kriteria lain jika 'Nilai' tidak ada, tapi biasanya 'Nilai' wajib ada
+             // throw new Exception("Format Dokumen Tidak Sesuai: Kolom 'Nilai' tidak ditemukan.");
+        }
+
+        $countSuccess = 0;
+
+        foreach ($rows as $row) 
+        {
+            // Ambil nama (case-insensitive key lookup)
+            $namaSiswa = null;
+            foreach ($row as $key => $val) {
+                if (strtolower($key) === 'nama') {
+                    $namaSiswa = $val;
+                    break;
+                }
             }
 
-            // 2. Cari atau Buat Siswa
-            $siswa = Siswa::updateOrCreate(
-                ['nama' => $row['nama']], // Argumen 1: Cari berdasarkan Nama
-                [                         // Argumen 2: Data baru jika nama tidak ditemukan
-                    'nisn'        => $row['nisn'],
-                    'tahun_masuk' => $row['tahun_masuk'] // Perhatikan underscore '_' karena header aslinya "Tahun Masuk"
-                ]
+            if (empty($namaSiswa)) continue; 
+
+            // 1. Buat Siswa jika belum ada
+            $siswa = Siswa::firstOrCreate(
+                ['nama' => $namaSiswa],
+                ['kode' => 'S-' . Str::uuid()->toString()]
             );
 
-            // 3. Masukkan Siswa ke Kelas & Semester ini
-            $dataSiswa = DataSiswaKelas::firstOrCreate([
-                'id_siswa'    => $siswa->id,
-                'id_semester' => $this->id_semester,
-                'id_kelas'    => $this->id_kelas
-            ]);
+            // 2. Masukkan ke Kelas (Penempatan)
+            $dataSiswa = DataSiswaKelas::firstOrCreate(
+                [
+                    'id_siswa' => $siswa->id,
+                    'id_semester' => $this->id_semester,
+                    'id_kelas' => $this->id_kelas
+                ]
+            );
+            
+            // 3. Simpan Nilai
+            foreach ($this->kriteriaMap as $namaKriteria => $idKriteria) 
+            {
+                $excelHeader = strtolower($namaKriteria);
+                if ($namaKriteria == 'Sikap/Akhlak') $excelHeader = 'sikap';
+                if ($namaKriteria == 'Ekstrakurikuler') $excelHeader = 'ekstrakurikuler';
 
-            // 4. Loop setiap Kriteria yang ada di Database untuk mencari nilainya di Excel
-            foreach ($this->kriteriaMap as $namaKriteriaDb => $idKriteria) {
-
-                // === LOGIKA MAPPING (PENTING) ===
-                // Kita harus menebak nama header di Excel berdasarkan nama di Database.
-                // Library Excel mengubah header jadi lowercase (slug).
-
-                $headerExcel = Str::slug($namaKriteriaDb, '_'); // Default: nama_kriteria jadi nama_kriteria (kecil)
-
-                // Override Manual (Sesuaikan dengan CSV 'Data Olah.csv' kamu)
-                $namaLower = strtolower($namaKriteriaDb);
-
-                if (str_contains($namaLower, 'sikap')) {
-                    $headerExcel = 'sikap';
-                } elseif (str_contains($namaLower, 'nilai') || str_contains($namaLower, 'akademik')) {
-                    $headerExcel = 'nilai'; // Karena di CSV namanya cuma 'Nilai'
-                } elseif (str_contains($namaLower, 'ekstra')) {
-                    $headerExcel = 'ekstrakurikuler'; // Menangani typo 'kuli' atau 'kuri'
-                } elseif (str_contains($namaLower, 'absen')) {
-                    $headerExcel = 'absensi';
-                } elseif (str_contains($namaLower, 'prestasi')) {
-                    $headerExcel = 'prestasi';
+                // Cari value di row dengan case-insensitive key
+                $val = null;
+                foreach ($row as $key => $value) {
+                    if (strtolower($key) === $excelHeader) {
+                        $val = $value;
+                        break;
+                    }
                 }
 
-                // 5. Ambil Nilai dari Row Excel
-                // Cek apakah kolom tersebut ada di Excel?
-                if (isset($row[$headerExcel])) {
-                    $nilai = $row[$headerExcel];
-
-                    // Pastikan nilai valid (bukan null/kosong string)
-                    if ($nilai !== null && $nilai !== '') {
-
-                        // 6. Simpan ke Database
-                        DataNilaiKriteria::updateOrCreate(
-                            [
-                                'id_data_siswa_kelas' => $dataSiswa->id,
-                                'id_kriteria'         => $idKriteria,
-                            ],
-                            [
-                                'nilai' => floatval($nilai) // Pastikan jadi angka desimal
-                            ]
-                        );
+                if ($val !== null && $val !== '') {
+                    // Bersihkan nilai jika ada karakter aneh
+                    if (is_string($val) && str_starts_with($val, '=')) {
+                        $val = 0; 
                     }
-                } else {
-                    // Debugging: Jika kolom tidak ketemu, catat di Log Laravel
-                    // Cek di storage/logs/laravel.log
-                    Log::warning("Kolom Excel '{$headerExcel}' tidak ditemukan untuk kriteria DB '{$namaKriteriaDb}'");
+
+                    DataNilaiKriteria::updateOrCreate(
+                        [
+                            'id_data_siswa_kelas' => $dataSiswa->id,
+                            'id_kriteria'         => $idKriteria,
+                        ],
+                        ['nilai' => $val]
+                    );
                 }
             }
+            $countSuccess++;
+        }
+        
+        if ($countSuccess === 0) {
+            throw new Exception("Gagal: Tidak ada data siswa yang berhasil dibaca. Mohon periksa kembali isi file Anda.");
         }
     }
 }
