@@ -121,6 +121,16 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
+                    <h4 class="card-title">Grafik Tren Waktu Proses Perhitungan (WP vs Borda)</h4>
+                    <p class="card-description">Perbandingan waktu proses perhitungan (ms) di setiap dataset.</p>
+                    <canvas id="waktuChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
                     <h4 class="card-title">Tabel Data Waktu</h4>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
@@ -246,4 +256,85 @@
             </div>
         @endforeach
     </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            var canvas = document.getElementById('waktuChart');
+            if (!canvas || typeof Chart === 'undefined') {
+                return;
+            }
+
+            var labels = {!! json_encode($chartLabels ?? []) !!};
+            var waktuWP = {!! json_encode($chartWaktuWP ?? []) !!};
+            var waktuBorda = {!! json_encode($chartWaktuBorda ?? []) !!};
+
+            var ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                            label: 'Waktu WP (ms)',
+                            data: waktuWP,
+                            borderColor: '#00c851',
+                            backgroundColor: 'rgba(0, 200, 81, 0.12)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            fill: false,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Waktu Borda (ms)',
+                            data: waktuBorda,
+                            borderColor: '#ffbb33',
+                            backgroundColor: 'rgba(255, 187, 51, 0.12)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            pointHoverRadius: 5,
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            },
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Waktu (ms)'
+                            }
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 90,
+                                minRotation: 45
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                var value = Number(tooltipItem.yLabel || 0).toFixed(2);
+                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + value + ' ms';
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top'
+                    }
+                }
+            });
+        });
+    </script>
 @endsection

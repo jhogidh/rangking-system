@@ -42,6 +42,15 @@ class LaporanGabunganController extends Controller
         $avgWaktuWP = $laporan->where('metode', 'WP')->avg('waktu_total');
         $avgWaktuBorda = $laporan->where('metode', 'Borda')->avg('waktu_total');
 
+        $chartLabels = [];
+        $chartWaktuWP = [];
+        $chartWaktuBorda = [];
+        foreach ($dataset as $row) {
+            $chartLabels[] = ($row['semester'] ?? '-') . ' - ' . ($row['kelas'] ?? '-');
+            $chartWaktuWP[] = isset($row['WP']['waktu']) ? (float) $row['WP']['waktu'] : 0.0;
+            $chartWaktuBorda[] = isset($row['Borda']['waktu']) ? (float) $row['Borda']['waktu'] : 0.0;
+        }
+
         $accuracyByScope = $this->buildAccuracyRekap();
         $accuracyTablesByCategory = [
             'keseluruhan' => $this->groupAccuracyRowsByCategory($accuracyByScope['keseluruhan'] ?? []),
@@ -53,6 +62,9 @@ class LaporanGabunganController extends Controller
             'dataset',
             'avgWaktuWP',
             'avgWaktuBorda',
+            'chartLabels',
+            'chartWaktuWP',
+            'chartWaktuBorda',
             'accuracyByScope',
             'accuracyTablesByCategory',
             'accuracySummaryByCategory'

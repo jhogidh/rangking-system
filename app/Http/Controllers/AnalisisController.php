@@ -187,6 +187,9 @@ class AnalisisController extends Controller
             return '-';
         }
 
-        return ((int) $manualRank === (int) $methodRank) ? 'Sesuai' : 'Tidak Sesuai';
+        $manualTop3 = (int) $manualRank <= 3;
+        $methodTop3 = (int) $methodRank <= 3;
+
+        return ($manualTop3 && $methodTop3) ? 'Sesuai' : 'Tidak Sesuai';
     }
 }
