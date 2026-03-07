@@ -148,13 +148,19 @@ class AnalisisController extends Controller
                 ->map(function ($items) {
                     $first = $items->first();
                     $kelas = $first->dataSiswaKelas->kelas ?? null;
+                    $manualRank = optional($items->firstWhere('metode', 'Manual'))->ranking;
+                    $wpRank = optional($items->firstWhere('metode', 'WP'))->ranking;
+                    $bordaRank = optional($items->firstWhere('metode', 'Borda'))->ranking;
+
                     return [
                         'id_data_siswa_kelas' => $first->id_data_siswa_kelas,
                         'nama_siswa' => $first->dataSiswaKelas->siswa->nama ?? 'N/A',
                         'kelas' => $kelas ? trim(($kelas->nama ?? '') . ' ' . ($kelas->sub ?? '')) : '-',
-                        'manual' => optional($items->firstWhere('metode', 'Manual'))->ranking,
-                        'wp' => optional($items->firstWhere('metode', 'WP'))->ranking,
-                        'borda' => optional($items->firstWhere('metode', 'Borda'))->ranking,
+                        'manual' => $manualRank,
+                        'wp' => $wpRank,
+                        'borda' => $bordaRank,
+                        'label_wp' => $this->buildComparisonLabel($manualRank, $wpRank),
+                        'label_borda' => $this->buildComparisonLabel($manualRank, $bordaRank),
                     ];
                 })
                 ->values()
@@ -173,5 +179,14 @@ class AnalisisController extends Controller
         }
 
         return $result;
+    }
+
+    private function buildComparisonLabel($manualRank, $methodRank): string
+    {
+        if ($manualRank === null || $methodRank === null) {
+            return '-';
+        }
+
+        return ((int) $manualRank === (int) $methodRank) ? 'Sesuai' : 'Tidak Sesuai';
     }
 }

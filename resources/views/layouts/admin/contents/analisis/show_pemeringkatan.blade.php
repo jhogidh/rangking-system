@@ -95,6 +95,59 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <hr class="my-4">
+                            <h5 class="mb-3">3 Teratas + Label Kesesuaian (vs Manual)</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Siswa</th>
+                                            <th>Kelas</th>
+                                            <th>Rank Manual</th>
+                                            <th>Rank WP</th>
+                                            <th>Label WP</th>
+                                            <th>Rank Borda</th>
+                                            <th>Label Borda</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $topRows = ($rankingsByCategory[$categoryKey] ?? collect())->take(3);
+                                        @endphp
+                                        @if ($topRows->count() > 0)
+                                            @foreach ($topRows as $row)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $row['nama_siswa'] }}</td>
+                                                    <td>{{ $row['kelas'] }}</td>
+                                                    <td>{{ $row['manual'] ?? 'N/A' }}</td>
+                                                    <td>{{ $row['wp'] ?? 'N/A' }}</td>
+                                                    <td>
+                                                        <span
+                                                            class="badge badge-{{ $row['label_wp'] === 'Sesuai' ? 'success' : ($row['label_wp'] === 'Tidak Sesuai' ? 'danger' : 'secondary') }}">
+                                                            {{ $row['label_wp'] }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ $row['borda'] ?? 'N/A' }}</td>
+                                                    <td>
+                                                        <span
+                                                            class="badge badge-{{ $row['label_borda'] === 'Sesuai' ? 'success' : ($row['label_borda'] === 'Tidak Sesuai' ? 'danger' : 'secondary') }}">
+                                                            {{ $row['label_borda'] }}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="8" class="text-center">Tidak ada data top 3 kategori ini.
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

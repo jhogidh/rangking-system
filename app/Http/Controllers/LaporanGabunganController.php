@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AnalisisPerbandingan;
 use App\Models\Ranking;
 use App\Services\SPK\RankingComparisonService;
+use Illuminate\Support\Collection;
 
 class LaporanGabunganController extends Controller
 {
@@ -15,83 +16,46 @@ class LaporanGabunganController extends Controller
 
     public function index()
     {
-        // Ambil hanya WP & Borda supaya label/chart konsisten
+        // Ambil hanya WP & Borda untuk rekap waktu.
         $laporan = AnalisisPerbandingan::with(['semester', 'kelas'])
             ->whereIn('metode', ['WP', 'Borda'])
+            ->whereNotNull('id_kelas')
             ->orderBy('id_semester', 'asc')
             ->orderBy('id_kelas', 'asc')
             ->get();
 
         $dataset = [];
 
-        // Data untuk Chart
-        $chartLabels = [];
-        $chartDataWP = [];
-        $chartDataBorda = [];
-        $chartWaktuWP = [];
-        $chartWaktuBorda = [];
-
         foreach ($laporan as $row) {
             $semesterLabel = $row->semester->tahun_mulai . '/' . $row->semester->tahun_selesai . ' ' . $row->semester->nama;
             $kelasLabel = $row->kelas ? $row->kelas->nama : 'All';
             $key = $row->id_semester . '-' . ($row->id_kelas ?? 'all');
 
-            $fullLabel = $semesterLabel . ' - ' . $kelasLabel;
-
             $dataset[$key]['semester'] = $semesterLabel;
             $dataset[$key]['kelas'] = $kelasLabel;
             $dataset[$key][$row->metode] = [
-                'spearman' => $row->spearman_rho,
                 'waktu' => $row->waktu_total,
             ];
-
-            if (!in_array($fullLabel, $chartLabels, true)) {
-                $chartLabels[] = $fullLabel;
-            }
-
-            $index = array_search($fullLabel, $chartLabels, true);
-
-            if ($row->metode === 'WP') {
-                $chartDataWP[$index] = $row->spearman_rho;
-                $chartWaktuWP[$index] = $row->waktu_total;
-            } elseif ($row->metode === 'Borda') {
-                $chartDataBorda[$index] = $row->spearman_rho;
-                $chartWaktuBorda[$index] = $row->waktu_total;
-            }
         }
-
-        // Rapikan index supaya urut 0..n
-        $chartDataWP = array_values($chartDataWP);
-        $chartDataBorda = array_values($chartDataBorda);
-        $chartWaktuWP = array_values($chartWaktuWP);
-        $chartWaktuBorda = array_values($chartWaktuBorda);
-
-        // Rata-rata akurasi
-        $avgWP = $laporan->where('metode', 'WP')->avg('spearman_rho');
-        $avgBorda = $laporan->where('metode', 'Borda')->avg('spearman_rho');
 
         // Rata-rata waktu
         $avgWaktuWP = $laporan->where('metode', 'WP')->avg('waktu_total');
         $avgWaktuBorda = $laporan->where('metode', 'Borda')->avg('waktu_total');
 
         $accuracyByScope = $this->buildAccuracyRekap();
-        $avgAkurasiRekapWp = collect($accuracyByScope['keseluruhan'] ?? [])->avg('akurasi_wp');
-        $avgAkurasiRekapBorda = collect($accuracyByScope['keseluruhan'] ?? [])->avg('akurasi_borda');
+        $accuracyTablesByCategory = [
+            'keseluruhan' => $this->groupAccuracyRowsByCategory($accuracyByScope['keseluruhan'] ?? []),
+            'top_3' => $this->groupAccuracyRowsByCategory($accuracyByScope['top_3'] ?? []),
+        ];
+        $accuracySummaryByCategory = $this->buildAccuracySummaryByCategory($accuracyTablesByCategory);
 
         return view('layouts.admin.contents.laporan.gabungan', compact(
             'dataset',
-            'avgWP',
-            'avgBorda',
             'avgWaktuWP',
             'avgWaktuBorda',
-            'chartLabels',
-            'chartDataWP',
-            'chartDataBorda',
-            'chartWaktuWP',
-            'chartWaktuBorda',
             'accuracyByScope',
-            'avgAkurasiRekapWp',
-            'avgAkurasiRekapBorda'
+            'accuracyTablesByCategory',
+            'accuracySummaryByCategory'
         ));
     }
 
@@ -130,15 +94,14 @@ class LaporanGabunganController extends Controller
                     $result[$scopeKey][] = [
                         'dataset_key' => $datasetKey,
                         'dataset_label' => $datasetLabel,
+                        'kategori_key' => $row['kategori_key'],
                         'kategori_label' => $row['kategori_label'],
                         'wp_sesuai' => $row['wp_sesuai'],
                         'wp_tidak_sesuai' => $row['wp_tidak_sesuai'],
                         'akurasi_wp' => $row['akurasi_wp'],
-                        'label_wp' => $row['label_wp'],
                         'borda_sesuai' => $row['borda_sesuai'],
                         'borda_tidak_sesuai' => $row['borda_tidak_sesuai'],
                         'akurasi_borda' => $row['akurasi_borda'],
-                        'label_borda' => $row['label_borda'],
                         'jumlah_manual' => $row['jumlah_manual'],
                     ];
                 }
@@ -149,5 +112,57 @@ class LaporanGabunganController extends Controller
         usort($result['top_3'], fn($a, $b) => strcmp($a['dataset_key'], $b['dataset_key']));
 
         return $result;
+    }
+
+    private function groupAccuracyRowsByCategory(array $rows): array
+    {
+        $categories = $this->rankingComparisonService->getCategoryLabels();
+        $grouped = [];
+        foreach ($categories as $categoryKey => $label) {
+            $grouped[$categoryKey] = [
+                'label' => $label,
+                'rows' => [],
+            ];
+        }
+
+        foreach ($rows as $row) {
+            $categoryKey = $row['kategori_key'] ?? null;
+            if (!$categoryKey || !isset($grouped[$categoryKey])) {
+                continue;
+            }
+            $grouped[$categoryKey]['rows'][] = $row;
+        }
+
+        return $grouped;
+    }
+
+    private function buildAccuracySummaryByCategory(array $accuracyTablesByCategory): array
+    {
+        $categories = $this->rankingComparisonService->getCategoryLabels();
+        $summary = [];
+        foreach ($categories as $categoryKey => $label) {
+            $rowsKeseluruhan = $accuracyTablesByCategory['keseluruhan'][$categoryKey]['rows'] ?? [];
+            $rowsTop3 = $accuracyTablesByCategory['top_3'][$categoryKey]['rows'] ?? [];
+
+            $summary[$categoryKey] = [
+                'label' => $label,
+                'avg_wp_keseluruhan' => $this->averageAccuracy($rowsKeseluruhan, 'akurasi_wp'),
+                'avg_borda_keseluruhan' => $this->averageAccuracy($rowsKeseluruhan, 'akurasi_borda'),
+                'avg_wp_top3' => $this->averageAccuracy($rowsTop3, 'akurasi_wp'),
+                'avg_borda_top3' => $this->averageAccuracy($rowsTop3, 'akurasi_borda'),
+            ];
+        }
+
+        return $summary;
+    }
+
+    private function averageAccuracy(array $rows, string $key): ?float
+    {
+        $values = collect($rows)->pluck($key)->filter(fn($v) => $v !== null)->values();
+        if ($values->isEmpty()) {
+            return null;
+        }
+
+        return round((float) $values->avg(), 2);
     }
 }

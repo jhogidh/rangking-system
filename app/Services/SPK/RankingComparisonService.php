@@ -57,12 +57,10 @@ class RankingComparisonService
                     'wp_sesuai' => $wpStats['sesuai'],
                     'wp_tidak_sesuai' => $wpStats['tidak_sesuai'],
                     'akurasi_wp' => $wpStats['akurasi'],
-                    'label_wp' => $this->accuracyLabel($wpStats['akurasi']),
                     'jumlah_borda_valid' => $bordaStats['total'],
                     'borda_sesuai' => $bordaStats['sesuai'],
                     'borda_tidak_sesuai' => $bordaStats['tidak_sesuai'],
                     'akurasi_borda' => $bordaStats['akurasi'],
-                    'label_borda' => $this->accuracyLabel($bordaStats['akurasi']),
                 ];
             }
 
@@ -148,15 +146,6 @@ class RankingComparisonService
             'tidak_sesuai' => $tidakSesuai,
             'akurasi' => $akurasi,
         ];
-    }
-
-    private function accuracyLabel(?float $akurasi): string
-    {
-        if ($akurasi === null) {
-            return '-';
-        }
-
-        return abs($akurasi - 100.0) < 0.00001 ? 'Sesuai' : 'Tidak Sesuai';
     }
 
     private function sortRanksByValue(array $ranks): array

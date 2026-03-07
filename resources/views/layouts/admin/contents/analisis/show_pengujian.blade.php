@@ -56,7 +56,6 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Akurasi Keseluruhan Kelas</h4>
-                        <p class="card-description">Label `Sesuai` jika ranking metode sama persis dengan manual.</p>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -64,10 +63,8 @@
                                         <th>Kategori</th>
                                         <th>WP (S/T)</th>
                                         <th>Akurasi WP</th>
-                                        <th>Label WP</th>
                                         <th>Borda (S/T)</th>
                                         <th>Akurasi Borda</th>
-                                        <th>Label Borda</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,16 +76,14 @@
                                                 <td>{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
                                                 <td>{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}
                                                 </td>
-                                                <td>{{ $row['label_wp'] }}</td>
                                                 <td>{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
                                                 <td>{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}
                                                 </td>
-                                                <td>{{ $row['label_borda'] }}</td>
                                             </tr>
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="7" class="text-center">Tidak ada data akurasi.</td>
+                                            <td colspan="5" class="text-center">Tidak ada data akurasi.</td>
                                         </tr>
                                     @endif
                                 </tbody>
@@ -102,7 +97,6 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Akurasi Top 3 (Berdasarkan Manual)</h4>
-                        <p class="card-description">S = Sesuai, T = Tidak Sesuai.</p>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
@@ -110,10 +104,8 @@
                                         <th>Kategori</th>
                                         <th>WP (S/T)</th>
                                         <th>Akurasi WP</th>
-                                        <th>Label WP</th>
                                         <th>Borda (S/T)</th>
                                         <th>Akurasi Borda</th>
-                                        <th>Label Borda</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -125,16 +117,14 @@
                                                 <td>{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
                                                 <td>{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}
                                                 </td>
-                                                <td>{{ $row['label_wp'] }}</td>
                                                 <td>{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
                                                 <td>{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}
                                                 </td>
-                                                <td>{{ $row['label_borda'] }}</td>
                                             </tr>
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="7" class="text-center">Tidak ada data akurasi top 3.</td>
+                                            <td colspan="5" class="text-center">Tidak ada data akurasi top 3.</td>
                                         </tr>
                                     @endif
                                 </tbody>
