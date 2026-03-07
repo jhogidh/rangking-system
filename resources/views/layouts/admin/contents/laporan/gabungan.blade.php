@@ -324,6 +324,7 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Rekap Akurasi Top 3 per Kategori</h4>
+                    <p class="card-description">S = Sesuai, T = Tidak Sesuai (dibanding ranking manual).</p>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>
