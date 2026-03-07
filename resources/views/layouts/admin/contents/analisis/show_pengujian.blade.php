@@ -55,47 +55,6 @@
             <div class="col-lg-6 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Akurasi Keseluruhan Kelas</h4>
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>Kategori</th>
-                                        <th>WP (S/T)</th>
-                                        <th>Akurasi WP</th>
-                                        <th>Borda (S/T)</th>
-                                        <th>Akurasi Borda</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php $overallRows = $accuracyByScope['keseluruhan'] ?? []; @endphp
-                                    @if (count($overallRows) > 0)
-                                        @foreach ($overallRows as $row)
-                                            <tr>
-                                                <td>{{ $row['kategori_label'] }}</td>
-                                                <td>{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
-                                                <td>{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}
-                                                </td>
-                                                <td>{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
-                                                <td>{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    @else
-                                        <tr>
-                                            <td colspan="5" class="text-center">Tidak ada data akurasi.</td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-6 grid-margin stretch-card">
-                <div class="card">
-                    <div class="card-body">
                         <h4 class="card-title">Akurasi Top 3 (Berdasarkan Manual)</h4>
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -125,6 +84,47 @@
                                     @else
                                         <tr>
                                             <td colspan="5" class="text-center">Tidak ada data akurasi top 3.</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Akurasi Keseluruhan Kelas</h4>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Kategori</th>
+                                        <th>WP (S/T)</th>
+                                        <th>Akurasi WP</th>
+                                        <th>Borda (S/T)</th>
+                                        <th>Akurasi Borda</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @php $overallRows = $accuracyByScope['keseluruhan'] ?? []; @endphp
+                                    @if (count($overallRows) > 0)
+                                        @foreach ($overallRows as $row)
+                                            <tr>
+                                                <td>{{ $row['kategori_label'] }}</td>
+                                                <td>{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
+                                                <td>{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}
+                                                </td>
+                                                <td>{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
+                                                <td>{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="5" class="text-center">Tidak ada data akurasi.</td>
                                         </tr>
                                     @endif
                                 </tbody>
