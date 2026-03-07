@@ -59,44 +59,7 @@
                             <p class="card-description mb-3">
                                 Data diurutkan berdasarkan ranking manual (kategori {{ strtolower($categoryLabel) }}).
                             </p>
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Nama Siswa</th>
-                                            <th>Kelas</th>
-                                            <th>Rank Manual</th>
-                                            <th>Rank WP</th>
-                                            <th>Rank Borda</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php
-                                            $rows = $rankingsByCategory[$categoryKey] ?? collect();
-                                        @endphp
-                                        @if ($rows->count() > 0)
-                                            @foreach ($rows as $row)
-                                                <tr>
-                                                    <td>{{ $loop->iteration }}</td>
-                                                    <td>{{ $row['nama_siswa'] }}</td>
-                                                    <td>{{ $row['kelas'] }}</td>
-                                                    <td>{{ $row['manual'] ?? 'N/A' }}</td>
-                                                    <td>{{ $row['wp'] ?? 'N/A' }}</td>
-                                                    <td>{{ $row['borda'] ?? 'N/A' }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @else
-                                            <tr>
-                                                <td colspan="6" class="text-center">Tidak ada data ranking kategori ini.
-                                                    (Sudah dihitung?)</td>
-                                            </tr>
-                                        @endif
-                                    </tbody>
-                                </table>
-                            </div>
 
-                            <hr class="my-4">
                             <h5 class="mb-3">3 Teratas + Label Kesesuaian (vs Manual)</h5>
                             <div class="table-responsive">
                                 <table class="table table-bordered">
@@ -143,6 +106,45 @@
                                             <tr>
                                                 <td colspan="8" class="text-center">Tidak ada data top 3 kategori ini.
                                                 </td>
+                                            </tr>
+                                        @endif
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <hr class="my-4">
+                            <h5 class="mb-3">Keseluruhan Kelas</h5>
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Nama Siswa</th>
+                                            <th>Kelas</th>
+                                            <th>Rank Manual</th>
+                                            <th>Rank WP</th>
+                                            <th>Rank Borda</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $rows = $rankingsByCategory[$categoryKey] ?? collect();
+                                        @endphp
+                                        @if ($rows->count() > 0)
+                                            @foreach ($rows as $row)
+                                                <tr>
+                                                    <td>{{ $loop->iteration }}</td>
+                                                    <td>{{ $row['nama_siswa'] }}</td>
+                                                    <td>{{ $row['kelas'] }}</td>
+                                                    <td>{{ $row['manual'] ?? 'N/A' }}</td>
+                                                    <td>{{ $row['wp'] ?? 'N/A' }}</td>
+                                                    <td>{{ $row['borda'] ?? 'N/A' }}</td>
+                                                </tr>
+                                            @endforeach
+                                        @else
+                                            <tr>
+                                                <td colspan="6" class="text-center">Tidak ada data ranking kategori ini.
+                                                    (Sudah dihitung?)</td>
                                             </tr>
                                         @endif
                                     </tbody>

@@ -63,10 +63,10 @@ class LaporanGabunganController extends Controller
     {
         $rankings = Ranking::with(['dataSiswaKelas.semester', 'dataSiswaKelas.kelas'])->get();
         $rankingsByDataset = $rankings
-            ->filter(fn($r) => $r->dataSiswaKelas !== null)
+            ->filter(fn($r) => $r->dataSiswaKelas !== null && $r->dataSiswaKelas->id_kelas !== null)
             ->groupBy(function ($ranking) {
                 $idSemester = $ranking->dataSiswaKelas->id_semester;
-                $idKelas = $ranking->dataSiswaKelas->id_kelas ?? 'all';
+                $idKelas = $ranking->dataSiswaKelas->id_kelas;
                 return $idSemester . '-' . $idKelas;
             });
 
@@ -143,6 +143,7 @@ class LaporanGabunganController extends Controller
         foreach ($categories as $categoryKey => $label) {
             $rowsKeseluruhan = $accuracyTablesByCategory['keseluruhan'][$categoryKey]['rows'] ?? [];
             $rowsTop3 = $accuracyTablesByCategory['top_3'][$categoryKey]['rows'] ?? [];
+            $countKeseluruhan = $this->aggregateCounts($rowsKeseluruhan);
 
             $summary[$categoryKey] = [
                 'label' => $label,
@@ -150,10 +151,28 @@ class LaporanGabunganController extends Controller
                 'avg_borda_keseluruhan' => $this->averageAccuracy($rowsKeseluruhan, 'akurasi_borda'),
                 'avg_wp_top3' => $this->averageAccuracy($rowsTop3, 'akurasi_wp'),
                 'avg_borda_top3' => $this->averageAccuracy($rowsTop3, 'akurasi_borda'),
+                'jumlah_siswa' => $countKeseluruhan['jumlah_siswa'],
+                'wp_sesuai' => $countKeseluruhan['wp_sesuai'],
+                'wp_tidak_sesuai' => $countKeseluruhan['wp_tidak_sesuai'],
+                'borda_sesuai' => $countKeseluruhan['borda_sesuai'],
+                'borda_tidak_sesuai' => $countKeseluruhan['borda_tidak_sesuai'],
             ];
         }
 
         return $summary;
+    }
+
+    private function aggregateCounts(array $rows): array
+    {
+        $collection = collect($rows);
+
+        return [
+            'jumlah_siswa' => (int) $collection->sum('jumlah_manual'),
+            'wp_sesuai' => (int) $collection->sum('wp_sesuai'),
+            'wp_tidak_sesuai' => (int) $collection->sum('wp_tidak_sesuai'),
+            'borda_sesuai' => (int) $collection->sum('borda_sesuai'),
+            'borda_tidak_sesuai' => (int) $collection->sum('borda_tidak_sesuai'),
+        ];
     }
 
     private function averageAccuracy(array $rows, string $key): ?float

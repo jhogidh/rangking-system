@@ -8,38 +8,48 @@
                     <h4 class="card-title">Ringkasan Akurasi per Kategori</h4>
                     <p class="card-description">Disajikan per kategori tanpa rata-rata gabungan lintas kategori.</p>
 
-                    @forelse($accuracySummaryByCategory as $summary)
-                        <div class="{{ !$loop->last ? 'mb-4 pb-3 border-bottom' : '' }}">
-                            <h5 class="mb-3">{{ $summary['label'] }}</h5>
-                            <div class="row">
-                                <div class="col-md-6 grid-margin stretch-card">
-                                    <div class="card bg-success text-white mb-0">
-                                        <div class="card-body">
-                                            <h4 class="card-title text-white">WP</h4>
-                                            <h2 class="mb-2">{{ is_null($summary['avg_wp_keseluruhan']) ? '-' : number_format($summary['avg_wp_keseluruhan'], 2) . '%' }}</h2>
-                                            <small class="d-block">Akurasi Keseluruhan</small>
-                                            <small class="d-block mt-2">Top 3:
-                                                {{ is_null($summary['avg_wp_top3']) ? '-' : number_format($summary['avg_wp_top3'], 2) . '%' }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-6 grid-margin stretch-card">
-                                    <div class="card bg-warning text-white mb-0">
-                                        <div class="card-body">
-                                            <h4 class="card-title text-white">Borda</h4>
-                                            <h2 class="mb-2">{{ is_null($summary['avg_borda_keseluruhan']) ? '-' : number_format($summary['avg_borda_keseluruhan'], 2) . '%' }}</h2>
-                                            <small class="d-block">Akurasi Keseluruhan</small>
-                                            <small class="d-block mt-2">Top 3:
-                                                {{ is_null($summary['avg_borda_top3']) ? '-' : number_format($summary['avg_borda_top3'], 2) . '%' }}</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-muted mb-0">Belum ada data akurasi.</p>
-                    @endforelse
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Kategori</th>
+                                    <th class="text-center">Jumlah Siswa</th>
+                                    <th class="text-center">WP Sesuai</th>
+                                    <th class="text-center">WP Tidak Sesuai</th>
+                                    <th class="text-center">Akurasi WP (All / Top 3)</th>
+                                    <th class="text-center">Borda Sesuai</th>
+                                    <th class="text-center">Borda Tidak Sesuai</th>
+                                    <th class="text-center">Akurasi Borda (All / Top 3)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($accuracySummaryByCategory as $summary)
+                                    <tr>
+                                        <td>{{ $summary['label'] }}</td>
+                                        <td class="text-center">{{ $summary['jumlah_siswa'] }}</td>
+                                        <td class="text-center text-success font-weight-bold">{{ $summary['wp_sesuai'] }}</td>
+                                        <td class="text-center text-danger font-weight-bold">{{ $summary['wp_tidak_sesuai'] }}</td>
+                                        <td class="text-center">
+                                            {{ is_null($summary['avg_wp_keseluruhan']) ? '-' : number_format($summary['avg_wp_keseluruhan'], 2) . '%' }}
+                                            /
+                                            {{ is_null($summary['avg_wp_top3']) ? '-' : number_format($summary['avg_wp_top3'], 2) . '%' }}
+                                        </td>
+                                        <td class="text-center text-success font-weight-bold">{{ $summary['borda_sesuai'] }}</td>
+                                        <td class="text-center text-danger font-weight-bold">{{ $summary['borda_tidak_sesuai'] }}</td>
+                                        <td class="text-center">
+                                            {{ is_null($summary['avg_borda_keseluruhan']) ? '-' : number_format($summary['avg_borda_keseluruhan'], 2) . '%' }}
+                                            /
+                                            {{ is_null($summary['avg_borda_top3']) ? '-' : number_format($summary['avg_borda_top3'], 2) . '%' }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="8" class="text-center">Belum ada data akurasi.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
