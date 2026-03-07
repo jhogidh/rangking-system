@@ -55,10 +55,6 @@ return new class extends Migration
             $table->foreignId('id_kelas')->constrained('kelas')->onDelete('cascade');
             $table->foreignId('id_semester')->constrained('semester')->onDelete('cascade');
             $table->timestamps();
-            $table->unique(
-                ['id_siswa', 'id_kelas', 'id_semester'],
-                'data_siswa_kelas_unique_siswa_kelas_semester'
-            );
         });
 
         // 8. data_nilai_kriteria
@@ -78,14 +74,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('id_data_siswa_kelas')->constrained('data_siswa_kelas')->onDelete('cascade');
             $table->string('metode', 50);
-            $table->string('kategori', 30)->default('semua');
             $table->float('hasil_alternatif')->default(0);
             $table->integer('ranking')->default(0);
             $table->timestamps();
-            $table->unique(
-                ['id_data_siswa_kelas', 'metode', 'kategori'],
-                'ranking_data_metode_kategori_unique'
-            );
         });
 
         // 10. analisis_perbandingan
