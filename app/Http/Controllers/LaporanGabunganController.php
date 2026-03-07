@@ -75,6 +75,8 @@ class LaporanGabunganController extends Controller
         $avgWaktuBorda = $laporan->where('metode', 'Borda')->avg('waktu_total');
 
         $accuracyByScope = $this->buildAccuracyRekap();
+        $avgAkurasiRekapWp = collect($accuracyByScope['keseluruhan'] ?? [])->avg('akurasi_wp');
+        $avgAkurasiRekapBorda = collect($accuracyByScope['keseluruhan'] ?? [])->avg('akurasi_borda');
 
         return view('layouts.admin.contents.laporan.gabungan', compact(
             'dataset',
@@ -87,7 +89,9 @@ class LaporanGabunganController extends Controller
             'chartDataBorda',
             'chartWaktuWP',
             'chartWaktuBorda',
-            'accuracyByScope'
+            'accuracyByScope',
+            'avgAkurasiRekapWp',
+            'avgAkurasiRekapBorda'
         ));
     }
 
@@ -127,8 +131,14 @@ class LaporanGabunganController extends Controller
                         'dataset_key' => $datasetKey,
                         'dataset_label' => $datasetLabel,
                         'kategori_label' => $row['kategori_label'],
-                        'spearman_wp' => $row['spearman_wp'],
-                        'spearman_borda' => $row['spearman_borda'],
+                        'wp_sesuai' => $row['wp_sesuai'],
+                        'wp_tidak_sesuai' => $row['wp_tidak_sesuai'],
+                        'akurasi_wp' => $row['akurasi_wp'],
+                        'label_wp' => $row['label_wp'],
+                        'borda_sesuai' => $row['borda_sesuai'],
+                        'borda_tidak_sesuai' => $row['borda_tidak_sesuai'],
+                        'akurasi_borda' => $row['akurasi_borda'],
+                        'label_borda' => $row['label_borda'],
                         'jumlah_manual' => $row['jumlah_manual'],
                     ];
                 }

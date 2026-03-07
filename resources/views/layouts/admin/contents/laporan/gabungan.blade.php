@@ -273,6 +273,10 @@
             <div class="card">
                 <div class="card-body">
                     <h4 class="card-title">Rekap Akurasi Keseluruhan Kelas per Kategori</h4>
+                    <p class="card-description">
+                        Rata-rata akurasi WP: <strong>{{ number_format($avgAkurasiRekapWp ?? 0, 2) }}%</strong>,
+                        Borda: <strong>{{ number_format($avgAkurasiRekapBorda ?? 0, 2) }}%</strong>.
+                    </p>
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead>
@@ -280,8 +284,12 @@
                                     <th class="text-center">No</th>
                                     <th>Dataset</th>
                                     <th>Kategori</th>
-                                    <th class="text-center">Spearman WP</th>
-                                    <th class="text-center">Spearman Borda</th>
+                                    <th class="text-center">WP (S/T)</th>
+                                    <th class="text-center">Akurasi WP</th>
+                                    <th class="text-center">Label WP</th>
+                                    <th class="text-center">Borda (S/T)</th>
+                                    <th class="text-center">Akurasi Borda</th>
+                                    <th class="text-center">Label Borda</th>
                                     <th class="text-center">Jumlah Data</th>
                                 </tr>
                             </thead>
@@ -292,17 +300,17 @@
                                         <td class="text-center">{{ $noAkurasiAll++ }}</td>
                                         <td>{{ $row['dataset_label'] }}</td>
                                         <td>{{ $row['kategori_label'] }}</td>
-                                        <td class="text-center">
-                                            {{ is_null($row['spearman_wp']) ? '-' : number_format($row['spearman_wp'], 5) }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ is_null($row['spearman_borda']) ? '-' : number_format($row['spearman_borda'], 5) }}
-                                        </td>
+                                        <td class="text-center">{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
+                                        <td class="text-center">{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}</td>
+                                        <td class="text-center">{{ $row['label_wp'] }}</td>
+                                        <td class="text-center">{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
+                                        <td class="text-center">{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}</td>
+                                        <td class="text-center">{{ $row['label_borda'] }}</td>
                                         <td class="text-center">{{ $row['jumlah_manual'] }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">Belum ada data akurasi.</td>
+                                        <td colspan="10" class="text-center">Belum ada data akurasi.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -323,8 +331,12 @@
                                     <th class="text-center">No</th>
                                     <th>Dataset</th>
                                     <th>Kategori</th>
-                                    <th class="text-center">Spearman WP</th>
-                                    <th class="text-center">Spearman Borda</th>
+                                    <th class="text-center">WP (S/T)</th>
+                                    <th class="text-center">Akurasi WP</th>
+                                    <th class="text-center">Label WP</th>
+                                    <th class="text-center">Borda (S/T)</th>
+                                    <th class="text-center">Akurasi Borda</th>
+                                    <th class="text-center">Label Borda</th>
                                     <th class="text-center">Jumlah Data</th>
                                 </tr>
                             </thead>
@@ -335,17 +347,17 @@
                                         <td class="text-center">{{ $noAkurasiTop++ }}</td>
                                         <td>{{ $row['dataset_label'] }}</td>
                                         <td>{{ $row['kategori_label'] }}</td>
-                                        <td class="text-center">
-                                            {{ is_null($row['spearman_wp']) ? '-' : number_format($row['spearman_wp'], 5) }}
-                                        </td>
-                                        <td class="text-center">
-                                            {{ is_null($row['spearman_borda']) ? '-' : number_format($row['spearman_borda'], 5) }}
-                                        </td>
+                                        <td class="text-center">{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
+                                        <td class="text-center">{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}</td>
+                                        <td class="text-center">{{ $row['label_wp'] }}</td>
+                                        <td class="text-center">{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
+                                        <td class="text-center">{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}</td>
+                                        <td class="text-center">{{ $row['label_borda'] }}</td>
                                         <td class="text-center">{{ $row['jumlah_manual'] }}</td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">Belum ada data akurasi top 3.</td>
+                                        <td colspan="10" class="text-center">Belum ada data akurasi top 3.</td>
                                     </tr>
                                 @endforelse
                             </tbody>

@@ -13,10 +13,6 @@ class RankingComparisonService
         Ranking::CATEGORY_NON_AKADEMIK => 'Non Akademik',
     ];
 
-    public function __construct(private AnalysisService $analysisService)
-    {
-    }
-
     public function getCategoryLabels(): array
     {
         return self::CATEGORY_LABELS;
@@ -50,15 +46,23 @@ class RankingComparisonService
 
                 [$manualForWp, $wpCompared] = $this->buildComparableRanks($manualRanks, $wpRanks, $topN);
                 [$manualForBorda, $bordaCompared] = $this->buildComparableRanks($manualRanks, $bordaRanks, $topN);
+                $wpStats = $this->calculateMatchStats($manualForWp, $wpCompared);
+                $bordaStats = $this->calculateMatchStats($manualForBorda, $bordaCompared);
 
                 $rows[] = [
                     'kategori_key' => $categoryKey,
                     'kategori_label' => $categoryLabel,
                     'jumlah_manual' => $topN ? min($topN, count($manualRanks)) : count($manualRanks),
-                    'jumlah_wp_valid' => count($wpCompared),
-                    'jumlah_borda_valid' => count($bordaCompared),
-                    'spearman_wp' => empty($wpCompared) ? null : $this->analysisService->calculateSpearman($manualForWp, $wpCompared),
-                    'spearman_borda' => empty($bordaCompared) ? null : $this->analysisService->calculateSpearman($manualForBorda, $bordaCompared),
+                    'jumlah_wp_valid' => $wpStats['total'],
+                    'wp_sesuai' => $wpStats['sesuai'],
+                    'wp_tidak_sesuai' => $wpStats['tidak_sesuai'],
+                    'akurasi_wp' => $wpStats['akurasi'],
+                    'label_wp' => $this->accuracyLabel($wpStats['akurasi']),
+                    'jumlah_borda_valid' => $bordaStats['total'],
+                    'borda_sesuai' => $bordaStats['sesuai'],
+                    'borda_tidak_sesuai' => $bordaStats['tidak_sesuai'],
+                    'akurasi_borda' => $bordaStats['akurasi'],
+                    'label_borda' => $this->accuracyLabel($bordaStats['akurasi']),
                 ];
             }
 
@@ -115,6 +119,44 @@ class RankingComparisonService
         }
 
         return [$manualCompared, $targetCompared];
+    }
+
+    private function calculateMatchStats(array $manualRanks, array $targetRanks): array
+    {
+        $sesuai = 0;
+        $tidakSesuai = 0;
+
+        foreach ($manualRanks as $studentClassId => $manualRank) {
+            $targetRank = $targetRanks[$studentClassId] ?? null;
+            if ($targetRank === null) {
+                continue;
+            }
+
+            if ((int) $manualRank === (int) $targetRank) {
+                $sesuai++;
+            } else {
+                $tidakSesuai++;
+            }
+        }
+
+        $total = $sesuai + $tidakSesuai;
+        $akurasi = $total > 0 ? round(($sesuai / $total) * 100, 2) : null;
+
+        return [
+            'total' => $total,
+            'sesuai' => $sesuai,
+            'tidak_sesuai' => $tidakSesuai,
+            'akurasi' => $akurasi,
+        ];
+    }
+
+    private function accuracyLabel(?float $akurasi): string
+    {
+        if ($akurasi === null) {
+            return '-';
+        }
+
+        return abs($akurasi - 100.0) < 0.00001 ? 'Sesuai' : 'Tidak Sesuai';
     }
 
     private function sortRanksByValue(array $ranks): array
