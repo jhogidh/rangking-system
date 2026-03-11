@@ -46,8 +46,8 @@ class RankingComparisonService
 
                 [$manualForWp, $wpCompared] = $this->buildComparableRanks($manualRanks, $wpRanks, $topN);
                 [$manualForBorda, $bordaCompared] = $this->buildComparableRanks($manualRanks, $bordaRanks, $topN);
-                $wpStats = $this->calculateMatchStats($manualForWp, $wpCompared);
-                $bordaStats = $this->calculateMatchStats($manualForBorda, $bordaCompared);
+                $wpStats = $this->calculateMatchStats($manualForWp, $wpCompared, $topN);
+                $bordaStats = $this->calculateMatchStats($manualForBorda, $bordaCompared, $topN);
 
                 $rows[] = [
                     'kategori_key' => $categoryKey,
@@ -119,26 +119,37 @@ class RankingComparisonService
         return [$manualCompared, $targetCompared];
     }
 
-    private function calculateMatchStats(array $manualRanks, array $targetRanks): array
+    private function calculateMatchStats(array $manualRanks, array $targetRanks, ?int $topN = null): array
     {
         $sesuai = 0;
         $tidakSesuai = 0;
 
-        foreach ($manualRanks as $studentClassId => $manualRank) {
-            $targetRank = $targetRanks[$studentClassId] ?? null;
-            if ($targetRank === null) {
-                continue;
+        if ($topN !== null) {
+            // Top N → cocok jika siswa ada di Top N target, urutan tidak masalah
+            foreach ($manualRanks as $studentId => $manualRank) {
+                if (isset($targetRanks[$studentId]) && $targetRanks[$studentId] <= $topN) {
+                    $sesuai++;
+                } else {
+                    $tidakSesuai++;
+                }
             }
+            $total = count($manualRanks);
+            $akurasi = $total > 0 ? round(($sesuai / $total) * 100, 2) : null;
+        } else {
+            // Keseluruhan → harus persis sama
+            foreach ($manualRanks as $studentId => $manualRank) {
+                $targetRank = $targetRanks[$studentId] ?? null;
+                if ($targetRank === null) continue;
 
-            if ((int) $manualRank === (int) $targetRank) {
-                $sesuai++;
-            } else {
-                $tidakSesuai++;
+                if ((int) $manualRank === (int) $targetRank) {
+                    $sesuai++;
+                } else {
+                    $tidakSesuai++;
+                }
             }
+            $total = $sesuai + $tidakSesuai;
+            $akurasi = $total > 0 ? round(($sesuai / $total) * 100, 2) : null;
         }
-
-        $total = $sesuai + $tidakSesuai;
-        $akurasi = $total > 0 ? round(($sesuai / $total) * 100, 2) : null;
 
         return [
             'total' => $total,
@@ -147,6 +158,7 @@ class RankingComparisonService
             'akurasi' => $akurasi,
         ];
     }
+
 
     private function sortRanksByValue(array $ranks): array
     {

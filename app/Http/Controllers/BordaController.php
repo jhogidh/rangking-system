@@ -74,8 +74,7 @@ class BordaController extends Controller
                 'waktu_tahap_3' => $bordaResult['timings']['tahap_3'] ?? 0,
                 'waktu_tahap_4' => $bordaResult['timings']['tahap_4'] ?? 0,
                 'waktu_tahap_5' => $bordaResult['timings']['tahap_5'] ?? 0,
-                'waktu_total' => $bordaResult['timings']['total'] ?? 0,
-                'spearman_rho' => null,
+                'waktu_total' => $bordaResult['timings']['total'] ?? 0
             ]
         );
 

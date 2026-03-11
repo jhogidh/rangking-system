@@ -74,8 +74,7 @@ class WpController extends Controller
                 'waktu_tahap_2' => $wpResult['timings']['tahap_2'] ?? 0,
                 'waktu_tahap_3' => $wpResult['timings']['tahap_3'] ?? 0,
                 'waktu_tahap_4' => $wpResult['timings']['tahap_4'] ?? 0,
-                'waktu_total' => $wpResult['timings']['total'] ?? 0,
-                'spearman_rho' => null,
+                'waktu_total' => $wpResult['timings']['total'] ?? 0
             ]
         );
 

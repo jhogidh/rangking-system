@@ -91,38 +91,6 @@ class AnalisisController extends Controller
         ));
     }
 
-    public function hitungSpearman(Request $request)
-    {
-        $request->validate(['id_semester' => 'required']);
-        $id_semester = $request->id_semester;
-        $id_kelas = $request->id_kelas;
-
-        $rankingsDB = Ranking::query()
-            ->where(function ($q) {
-                $q->where('kategori', Ranking::CATEGORY_ALL)->orWhereNull('kategori');
-            })
-            ->whereHas('dataSiswaKelas', function ($q_siswa) use ($id_semester, $id_kelas) {
-                $q_siswa->where('id_semester', $id_semester);
-                if ($id_kelas) $q_siswa->where('id_kelas', $id_kelas);
-            })->get();
-
-        $manualRanks = $rankingsDB->where('metode', 'Manual')->pluck('ranking', 'id_data_siswa_kelas');
-        $wpRanks = $rankingsDB->where('metode', 'WP')->pluck('ranking', 'id_data_siswa_kelas');
-        $bordaRanks = $rankingsDB->where('metode', 'Borda')->pluck('ranking', 'id_data_siswa_kelas');
-
-        if ($manualRanks->isEmpty() || $wpRanks->isEmpty() || $bordaRanks->isEmpty()) {
-            return redirect()->back()->with('error', 'Gagal hitung Spearman. Pastikan data Borda, WP, dan Manual sudah dihitung (Menu 1, 3, 4).');
-        }
-
-        $spearman_wp = $this->analysisService->calculateSpearman($manualRanks->toArray(), $wpRanks->toArray());
-        $spearman_borda = $this->analysisService->calculateSpearman($manualRanks->toArray(), $bordaRanks->toArray());
-
-        AnalisisPerbandingan::updateOrCreate(['id_semester' => $id_semester, 'id_kelas' => $id_kelas, 'metode' => 'WP'], ['spearman_rho' => $spearman_wp]);
-        AnalisisPerbandingan::updateOrCreate(['id_semester' => $id_semester, 'id_kelas' => $id_kelas, 'metode' => 'Borda'], ['spearman_rho' => $spearman_borda]);
-
-        return redirect()->back()->with('success', 'Perhitungan Akurasi (Spearman) Selesai!');
-    }
-
     private function getFilteredRankings(array $filters): Collection
     {
         return Ranking::query()

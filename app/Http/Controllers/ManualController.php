@@ -142,8 +142,7 @@ class ManualController extends Controller
                 'metode' => 'Manual',
                 'waktu_tahap_1' => $manualResult['timings']['tahap_1'] ?? 0,
                 'waktu_tahap_2' => $manualResult['timings']['tahap_2'] ?? 0,
-                'waktu_total' => $manualResult['timings']['total'] ?? 0,
-                'spearman_rho' => 1.00
+                'waktu_total' => $manualResult['timings']['total'] ?? 0
             ]);
         }
 

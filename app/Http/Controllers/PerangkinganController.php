@@ -98,13 +98,27 @@ class PerangkinganController extends Controller
         $manualResult = $this->manualService->calculate($alternatives, $criteria);
 
         $processedSiswaIds = array_keys($alternatives);
-        Ranking::whereIn('id_data_siswa_kelas', $processedSiswaIds)
-            ->where('kategori', Ranking::CATEGORY_ALL)
-            ->delete();
+        Ranking::whereHas('dataSiswaKelas', function ($q) use ($id_semester, $id_kelas) {
+            $q->where('id_semester', $id_semester);
 
-        $saveRanking = function ($result, $metode) {
-            $ranks = RankingHelper::denseRanks($result['values']);
-            foreach ($result['values'] as $id_data_siswa_kelas => $nilai_alternatif) {
+            if ($id_kelas) {
+                $q->where('id_kelas', $id_kelas);
+            }
+        })->where('kategori', Ranking::CATEGORY_ALL)->delete();
+
+
+        $$saveRanking = function ($result, $metode) {
+
+            $values = $result['values'];
+
+            // Urutkan nilai dari terbesar ke terkecil
+            arsort($values);
+
+            // Hitung ranking
+            $ranks = RankingHelper::denseRanks($values);
+
+            foreach ($values as $id_data_siswa_kelas => $nilai_alternatif) {
+
                 Ranking::create([
                     'id_data_siswa_kelas' => $id_data_siswa_kelas,
                     'metode' => $metode,
@@ -115,6 +129,7 @@ class PerangkinganController extends Controller
             }
         };
 
+
         $saveRanking($wpResult, 'WP');
         $saveRanking($bordaResult, 'Borda');
         $saveRanking($manualResult, 'Manual');
@@ -123,10 +138,6 @@ class PerangkinganController extends Controller
         $manualRanks = RankingHelper::denseRanks($manualResult['values']);
         $wpRanks = RankingHelper::denseRanks($wpResult['values']);
         $bordaRanks = RankingHelper::denseRanks($bordaResult['values']);
-
-        $spearman_wp = $this->analysisService->calculateSpearman($manualRanks, $wpRanks);
-        $spearman_borda = $this->analysisService->calculateSpearman($manualRanks, $bordaRanks);
-
         $queryStatistik = AnalisisPerbandingan::where('id_semester', $id_semester);
         if ($id_kelas) {
             $queryStatistik->where('id_kelas', $id_kelas);
@@ -143,8 +154,7 @@ class PerangkinganController extends Controller
             'waktu_tahap_2' => $wpResult['timings']['tahap_2'] ?? 0,
             'waktu_tahap_3' => $wpResult['timings']['tahap_3'] ?? 0,
             'waktu_tahap_4' => $wpResult['timings']['tahap_4'] ?? 0,
-            'waktu_total' => $wpResult['timings']['total'] ?? 0,
-            'spearman_rho' => $spearman_wp
+            'waktu_total' => $wpResult['timings']['total'] ?? 0
         ]);
 
         AnalisisPerbandingan::create([
@@ -156,8 +166,7 @@ class PerangkinganController extends Controller
             'waktu_tahap_3' => $bordaResult['timings']['tahap_3'] ?? 0,
             'waktu_tahap_4' => $bordaResult['timings']['tahap_4'] ?? 0,
             'waktu_tahap_5' => $bordaResult['timings']['tahap_5'] ?? 0,
-            'waktu_total' => $bordaResult['timings']['total'] ?? 0,
-            'spearman_rho' => $spearman_borda
+            'waktu_total' => $bordaResult['timings']['total'] ?? 0
         ]);
 
         AnalisisPerbandingan::create([
@@ -166,8 +175,7 @@ class PerangkinganController extends Controller
             'metode' => 'Manual',
             'waktu_tahap_1' => $manualResult['timings']['tahap_1'] ?? 0,
             'waktu_tahap_2' => $manualResult['timings']['tahap_2'] ?? 0,
-            'waktu_total' => $manualResult['timings']['total'] ?? 0,
-            'spearman_rho' => 1.00
+            'waktu_total' => $manualResult['timings']['total'] ?? 0
         ]);
 
         return redirect()->route('admin.analisis.show', [

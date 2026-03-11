@@ -24,8 +24,7 @@ class AnalisisPerbandingan extends Model
         'waktu_tahap_3',
         'waktu_tahap_4',
         'waktu_tahap_5', // Untuk Borda
-        'waktu_total',
-        'spearman_rho',
+        'waktu_total'
     ];
 
     /**
