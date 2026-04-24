@@ -123,50 +123,51 @@ $bordaAkademikTop3 = [83, 86, 89];
             // ===============================
             // GRAFIK AKURASI DATA ASLI
             // ===============================
+            $roundOrNull = static fn($value) => $value === null ? null : round((float) $value, 2);
 
             // AKADEMIK
-            $rowsAkademik = $accuracyTablesByCategory['keseluruhan']['akademik']['rows'] ?? [];
-            $rowsAkademikTop3 = $accuracyTablesByCategory['top_3']['akademik']['rows'] ?? [];
+            $rowsAkademik = $accuracyTablesByCategory['keseluruhan'][Ranking::CATEGORY_AKADEMIK]['rows'] ?? [];
+            $rowsAkademikTop3 = $accuracyTablesByCategory['top_3'][Ranking::CATEGORY_AKADEMIK]['rows'] ?? [];
 
             $labels = collect($rowsAkademik)->pluck('dataset_label')->values()->toArray();
 
-            $wpAkademikKeseluruhan = collect($rowsAkademik)->pluck('akurasi_wp')->map(fn($v) => round($v, 2))->values()->toArray();
+            $wpAkademikKeseluruhan = collect($rowsAkademik)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
 
-            $bordaAkademikKeseluruhan = collect($rowsAkademik)->pluck('akurasi_borda')->map(fn($v) => round($v, 2))->values()->toArray();
+            $bordaAkademikKeseluruhan = collect($rowsAkademik)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
 
-            $wpAkademikTop3 = collect($rowsAkademikTop3)->pluck('akurasi_wp')->map(fn($v) => round($v, 2))->values()->toArray();
+            $wpAkademikTop3 = collect($rowsAkademikTop3)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
 
-            $bordaAkademikTop3 = collect($rowsAkademikTop3)->pluck('akurasi_borda')->map(fn($v) => round($v, 2))->values()->toArray();
+            $bordaAkademikTop3 = collect($rowsAkademikTop3)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
 
 
             // NON AKADEMIK
-            $rowsNon = $accuracyTablesByCategory['keseluruhan']['non_akademik']['rows'] ?? [];
-            $rowsNonTop3 = $accuracyTablesByCategory['top_3']['non_akademik']['rows'] ?? [];
+            $rowsNon = $accuracyTablesByCategory['keseluruhan'][Ranking::CATEGORY_NON_AKADEMIK]['rows'] ?? [];
+            $rowsNonTop3 = $accuracyTablesByCategory['top_3'][Ranking::CATEGORY_NON_AKADEMIK]['rows'] ?? [];
 
             $labelsNon = collect($rowsNon)->pluck('dataset_label')->values()->toArray();
 
-            $wpNonKeseluruhan = collect($rowsNon)->pluck('akurasi_wp')->map(fn($v) => round($v, 2))->values()->toArray();
+            $wpNonKeseluruhan = collect($rowsNon)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
 
-            $bordaNonKeseluruhan = collect($rowsNon)->pluck('akurasi_borda')->map(fn($v) => round($v, 2))->values()->toArray();
+            $bordaNonKeseluruhan = collect($rowsNon)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
 
-            $wpNonTop3 = collect($rowsNonTop3)->pluck('akurasi_wp')->map(fn($v) => round($v, 2))->values()->toArray();
+            $wpNonTop3 = collect($rowsNonTop3)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
 
-            $bordaNonTop3 = collect($rowsNonTop3)->pluck('akurasi_borda')->map(fn($v) => round($v, 2))->values()->toArray();
+            $bordaNonTop3 = collect($rowsNonTop3)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
 
 
             // SEMUA
-            $rowsSemua = $accuracyTablesByCategory['keseluruhan']['semua']['rows'] ?? [];
-            $rowsSemuaTop3 = $accuracyTablesByCategory['top_3']['semua']['rows'] ?? [];
+            $rowsSemua = $accuracyTablesByCategory['keseluruhan'][Ranking::CATEGORY_ALL]['rows'] ?? [];
+            $rowsSemuaTop3 = $accuracyTablesByCategory['top_3'][Ranking::CATEGORY_ALL]['rows'] ?? [];
 
             $labelsSemua = collect($rowsSemua)->pluck('dataset_label')->values()->toArray();
 
-            $wpSemuaKeseluruhan = collect($rowsSemua)->pluck('akurasi_wp')->map(fn($v) => round($v, 2))->values()->toArray();
+            $wpSemuaKeseluruhan = collect($rowsSemua)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
 
-            $bordaSemuaKeseluruhan = collect($rowsSemua)->pluck('akurasi_borda')->map(fn($v) => round($v, 2))->values()->toArray();
+            $bordaSemuaKeseluruhan = collect($rowsSemua)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
 
-            $wpSemuaTop3 = collect($rowsSemuaTop3)->pluck('akurasi_wp')->map(fn($v) => round($v, 2))->values()->toArray();
+            $wpSemuaTop3 = collect($rowsSemuaTop3)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
 
-            $bordaSemuaTop3 = collect($rowsSemuaTop3)->pluck('akurasi_borda')->map(fn($v) => round($v, 2))->values()->toArray();
+            $bordaSemuaTop3 = collect($rowsSemuaTop3)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
         }
 
         return view('layouts.admin.contents.analisis.show_pengujian', compact(

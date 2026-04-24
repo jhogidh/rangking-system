@@ -309,148 +309,346 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var canvas = document.getElementById('waktuChart');
-            if (!canvas || typeof Chart === 'undefined') {
+            if (typeof Chart === 'undefined') {
                 return;
             }
 
-            var labels = {!! json_encode($chartLabels ?? []) !!};
-            var waktuWP = {!! json_encode($chartWaktuWP ?? []) !!};
-            var waktuBorda = {!! json_encode($chartWaktuBorda ?? []) !!};
-
-            var ctx = canvas.getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                            label: 'Waktu WP (ms)',
-                            data: waktuWP,
-                            borderColor: '#00c851',
-                            backgroundColor: 'rgba(0, 200, 81, 0.12)',
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            pointHoverRadius: 5,
-                            fill: false,
-                            tension: 0.2
-                        },
-                        {
-                            label: 'Waktu Borda (ms)',
-                            data: waktuBorda,
-                            borderColor: '#ffbb33',
-                            backgroundColor: 'rgba(255, 187, 51, 0.12)',
-                            borderWidth: 2,
-                            pointRadius: 3,
-                            pointHoverRadius: 5,
-                            fill: false,
-                            tension: 0.2
-                        }
-                    ]
-                },
-                options: {
+            function buildLineOptions(options) {
+                var base = {
                     responsive: true,
                     maintainAspectRatio: true,
-                    interaction: {
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false,
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                var value = Number(tooltipItem.yLabel || 0).toFixed(2);
+                                var suffix = (options && options.tooltipSuffix) ? options.tooltipSuffix : '';
+                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + value + suffix;
+                            }
+                        }
+                    },
+                    hover: {
                         mode: 'index',
                         intersect: false
                     },
+                    legend: {
+                        position: 'top'
+                    },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Waktu (ms)'
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                callback: function(value) {
+                                    if (options && options.yTickSuffix) {
+                                        return value + options.yTickSuffix;
+                                    }
+                                    return value;
+                                }
+                            },
+                            scaleLabel: {
+                                display: !!(options && options.yTitle),
+                                labelString: (options && options.yTitle) ? options.yTitle : ''
                             }
-                        },
-                        x: {
+                        }],
+                        xAxes: [{
                             ticks: {
                                 maxRotation: 90,
                                 minRotation: 45
                             }
-                        }
-                    },
-                    tooltips: {
-                        callbacks: {
-                            label: function(tooltipItem, data) {
-                                var value = Number(tooltipItem.yLabel || 0).toFixed(2);
-                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + value +
-                                    ' ms';
-                            }
-                        }
-                    },
-                    legend: {
-                        position: 'top'
+                        }]
                     }
-                }
-            });
+                };
 
-            // =====================
-            // CHART AKADEMIK
-            // =====================
-            var ctxAkademik = document.getElementById('chartAkademik');
-            if (ctxAkademik) {
-                new Chart(ctxAkademik.getContext('2d'), {
+                if (options && typeof options.minY !== 'undefined') {
+                    base.scales.yAxes[0].ticks.min = options.minY;
+                }
+                if (options && typeof options.maxY !== 'undefined') {
+                    base.scales.yAxes[0].ticks.max = options.maxY;
+                }
+
+                return base;
+            }
+
+            function createLineChart(canvasId, labels, datasets, options) {
+                var canvas = document.getElementById(canvasId);
+                if (!canvas) {
+                    return null;
+                }
+
+                var ctx = canvas.getContext('2d');
+                return new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: {!! json_encode($labels ?? []) !!},
-                        datasets: [{
-                                label: 'WP Keseluruhan',
-                                data: {!! json_encode($wpAkademikKeseluruhan ?? []) !!}
-                            },
-                            {
-                                label: 'WP Top 3',
-                                data: {!! json_encode($wpAkademikTop3 ?? []) !!}
-                            },
-                            {
-                                label: 'Borda Keseluruhan',
-                                data: {!! json_encode($bordaAkademikKeseluruhan ?? []) !!}
-                            },
-                            {
-                                label: 'Borda Top 3',
-                                data: {!! json_encode($bordaAkademikTop3 ?? []) !!}
-                            }
-                        ]
-                    }
+                        labels: labels || [],
+                        datasets: datasets || []
+                    },
+                    options: buildLineOptions(options)
                 });
             }
 
             // =====================
-// CHART NON AKADEMIK
-// =====================
-var ctxNon = document.getElementById('chartNonAkademik');
-if (ctxNon) {
-    new Chart(ctxNon.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: {!! json_encode($labelsNon ?? []) !!},
-            datasets: [
-                { label: 'WP Keseluruhan', data: {!! json_encode($wpNonKeseluruhan ?? []) !!} },
-                { label: 'WP Top 3', data: {!! json_encode($wpNonTop3 ?? []) !!} },
-                { label: 'Borda Keseluruhan', data: {!! json_encode($bordaNonKeseluruhan ?? []) !!} },
-                { label: 'Borda Top 3', data: {!! json_encode($bordaNonTop3 ?? []) !!} }
-            ]
-        }
-    });
-}
+            // CHART WAKTU
+            // =====================
+            createLineChart(
+                'waktuChart',
+                {!! json_encode($chartLabels ?? []) !!},
+                [{
+                        label: 'Waktu WP (ms)',
+                        data: {!! json_encode($chartWaktuWP ?? []) !!},
+                        borderColor: '#00c851',
+                        backgroundColor: 'rgba(0, 200, 81, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Waktu Borda (ms)',
+                        data: {!! json_encode($chartWaktuBorda ?? []) !!},
+                        borderColor: '#ffbb33',
+                        backgroundColor: 'rgba(255, 187, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    }
+                ],
+                { yTitle: 'Waktu (ms)', tooltipSuffix: ' ms' }
+            );
 
-// =====================
-// CHART SEMUA
-// =====================
-var ctxSemua = document.getElementById('chartSemua');
-if (ctxSemua) {
-    new Chart(ctxSemua.getContext('2d'), {
-        type: 'line',
-        data: {
-            labels: {!! json_encode($labelsSemua ?? []) !!},
-            datasets: [
-                { label: 'WP Keseluruhan', data: {!! json_encode($wpSemuaKeseluruhan ?? []) !!} },
-                { label: 'WP Top 3', data: {!! json_encode($wpSemuaTop3 ?? []) !!} },
-                { label: 'Borda Keseluruhan', data: {!! json_encode($bordaSemuaKeseluruhan ?? []) !!} },
-                { label: 'Borda Top 3', data: {!! json_encode($bordaSemuaTop3 ?? []) !!} }
-            ]
-        }
-    });
-}
+            // =====================
+            // CHART AKADEMIK
+            // =====================
+            var akademikChart = createLineChart(
+                'chartAkademik',
+                {!! json_encode($labels ?? []) !!},
+                [{
+                        label: 'WP Keseluruhan',
+                        data: {!! json_encode($wpAkademikKeseluruhan ?? []) !!},
+                        borderColor: '#00c851',
+                        backgroundColor: 'rgba(0, 200, 81, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'WP Top 3',
+                        data: {!! json_encode($wpAkademikTop3 ?? []) !!},
+                        borderColor: '#007e33',
+                        backgroundColor: 'rgba(0, 126, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Borda Keseluruhan',
+                        data: {!! json_encode($bordaAkademikKeseluruhan ?? []) !!},
+                        borderColor: '#ffbb33',
+                        backgroundColor: 'rgba(255, 187, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Borda Top 3',
+                        data: {!! json_encode($bordaAkademikTop3 ?? []) !!},
+                        borderColor: '#ff8800',
+                        backgroundColor: 'rgba(255, 136, 0, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    }
+                ],
+                { yTitle: 'Akurasi (%)', minY: 0, maxY: 100, yTickSuffix: '%', tooltipSuffix: ' %' }
+            );
+
+            // =====================
+            // CHART NON AKADEMIK
+            // =====================
+            var nonChart = createLineChart(
+                'chartNonAkademik',
+                {!! json_encode($labelsNon ?? []) !!},
+                [{
+                        label: 'WP Keseluruhan',
+                        data: {!! json_encode($wpNonKeseluruhan ?? []) !!},
+                        borderColor: '#00c851',
+                        backgroundColor: 'rgba(0, 200, 81, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'WP Top 3',
+                        data: {!! json_encode($wpNonTop3 ?? []) !!},
+                        borderColor: '#007e33',
+                        backgroundColor: 'rgba(0, 126, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Borda Keseluruhan',
+                        data: {!! json_encode($bordaNonKeseluruhan ?? []) !!},
+                        borderColor: '#ffbb33',
+                        backgroundColor: 'rgba(255, 187, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Borda Top 3',
+                        data: {!! json_encode($bordaNonTop3 ?? []) !!},
+                        borderColor: '#ff8800',
+                        backgroundColor: 'rgba(255, 136, 0, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    }
+                ],
+                { yTitle: 'Akurasi (%)', minY: 0, maxY: 100, yTickSuffix: '%', tooltipSuffix: ' %' }
+            );
+
+            // =====================
+            // CHART SEMUA
+            // =====================
+            var semuaChart = createLineChart(
+                'chartSemua',
+                {!! json_encode($labelsSemua ?? []) !!},
+                [{
+                        label: 'WP Keseluruhan',
+                        data: {!! json_encode($wpSemuaKeseluruhan ?? []) !!},
+                        borderColor: '#00c851',
+                        backgroundColor: 'rgba(0, 200, 81, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'WP Top 3',
+                        data: {!! json_encode($wpSemuaTop3 ?? []) !!},
+                        borderColor: '#007e33',
+                        backgroundColor: 'rgba(0, 126, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Borda Keseluruhan',
+                        data: {!! json_encode($bordaSemuaKeseluruhan ?? []) !!},
+                        borderColor: '#ffbb33',
+                        backgroundColor: 'rgba(255, 187, 51, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Borda Top 3',
+                        data: {!! json_encode($bordaSemuaTop3 ?? []) !!},
+                        borderColor: '#ff8800',
+                        backgroundColor: 'rgba(255, 136, 0, 0.12)',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        fill: false,
+                        lineTension: 0.2,
+                        spanGaps: true
+                    }
+                ],
+                { yTitle: 'Akurasi (%)', minY: 0, maxY: 100, yTickSuffix: '%', tooltipSuffix: ' %' }
+            );
+
+            // =====================
+            // SLIDER CHART AKURASI
+            // =====================
+            var slides = [{
+                    id: 'chart1',
+                    title: 'Akademik',
+                    chart: akademikChart
+                },
+                {
+                    id: 'chart2',
+                    title: 'Non Akademik',
+                    chart: nonChart
+                },
+                {
+                    id: 'chart3',
+                    title: 'Semua Kriteria',
+                    chart: semuaChart
+                }
+            ];
+
+            var currentChartIndex = 0;
+
+            function showChart(index) {
+                currentChartIndex = index;
+                for (var i = 0; i < slides.length; i++) {
+                    var el = document.getElementById(slides[i].id);
+                    if (!el) continue;
+                    if (i === index) el.classList.remove('d-none');
+                    else el.classList.add('d-none');
+                }
+
+                var titleEl = document.getElementById('judulChart');
+                if (titleEl && slides[index]) {
+                    titleEl.textContent = slides[index].title;
+                }
+
+                if (slides[index] && slides[index].chart) {
+                    setTimeout(function() {
+                        slides[index].chart.resize();
+                    }, 50);
+                }
+            }
+
+            window.nextChart = function() {
+                var next = (currentChartIndex + 1) % slides.length;
+                showChart(next);
+            };
+
+            window.prevChart = function() {
+                var prev = (currentChartIndex - 1 + slides.length) % slides.length;
+                showChart(prev);
+            };
+
+            showChart(0);
 
         });
         

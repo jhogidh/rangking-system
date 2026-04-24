@@ -58,6 +58,38 @@ class LaporanGabunganController extends Controller
         ];
         $accuracySummaryByCategory = $this->buildAccuracySummaryByCategory($accuracyTablesByCategory);
 
+        $roundOrNull = static fn($value) => $value === null ? null : round((float) $value, 2);
+
+        // ===============================
+        // DATA GRAFIK AKURASI (WP vs Borda)
+        // ===============================
+        $rowsAkademik = $accuracyTablesByCategory['keseluruhan'][Ranking::CATEGORY_AKADEMIK]['rows'] ?? [];
+        $rowsAkademikTop3 = $accuracyTablesByCategory['top_3'][Ranking::CATEGORY_AKADEMIK]['rows'] ?? [];
+
+        $labels = collect($rowsAkademik)->pluck('dataset_label')->values()->toArray();
+        $wpAkademikKeseluruhan = collect($rowsAkademik)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
+        $bordaAkademikKeseluruhan = collect($rowsAkademik)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
+        $wpAkademikTop3 = collect($rowsAkademikTop3)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
+        $bordaAkademikTop3 = collect($rowsAkademikTop3)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
+
+        $rowsNon = $accuracyTablesByCategory['keseluruhan'][Ranking::CATEGORY_NON_AKADEMIK]['rows'] ?? [];
+        $rowsNonTop3 = $accuracyTablesByCategory['top_3'][Ranking::CATEGORY_NON_AKADEMIK]['rows'] ?? [];
+
+        $labelsNon = collect($rowsNon)->pluck('dataset_label')->values()->toArray();
+        $wpNonKeseluruhan = collect($rowsNon)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
+        $bordaNonKeseluruhan = collect($rowsNon)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
+        $wpNonTop3 = collect($rowsNonTop3)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
+        $bordaNonTop3 = collect($rowsNonTop3)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
+
+        $rowsSemua = $accuracyTablesByCategory['keseluruhan'][Ranking::CATEGORY_ALL]['rows'] ?? [];
+        $rowsSemuaTop3 = $accuracyTablesByCategory['top_3'][Ranking::CATEGORY_ALL]['rows'] ?? [];
+
+        $labelsSemua = collect($rowsSemua)->pluck('dataset_label')->values()->toArray();
+        $wpSemuaKeseluruhan = collect($rowsSemua)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
+        $bordaSemuaKeseluruhan = collect($rowsSemua)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
+        $wpSemuaTop3 = collect($rowsSemuaTop3)->pluck('akurasi_wp')->map($roundOrNull)->values()->toArray();
+        $bordaSemuaTop3 = collect($rowsSemuaTop3)->pluck('akurasi_borda')->map($roundOrNull)->values()->toArray();
+
         return view('layouts.admin.contents.laporan.gabungan', compact(
             'dataset',
             'avgWaktuWP',
@@ -67,7 +99,28 @@ class LaporanGabunganController extends Controller
             'chartWaktuBorda',
             'accuracyByScope',
             'accuracyTablesByCategory',
-            'accuracySummaryByCategory'
+            'accuracySummaryByCategory',
+
+            // AKADEMIK
+            'labels',
+            'wpAkademikKeseluruhan',
+            'wpAkademikTop3',
+            'bordaAkademikKeseluruhan',
+            'bordaAkademikTop3',
+
+            // NON AKADEMIK
+            'labelsNon',
+            'wpNonKeseluruhan',
+            'wpNonTop3',
+            'bordaNonKeseluruhan',
+            'bordaNonTop3',
+
+            // SEMUA
+            'labelsSemua',
+            'wpSemuaKeseluruhan',
+            'wpSemuaTop3',
+            'bordaSemuaKeseluruhan',
+            'bordaSemuaTop3'
         ));
     }
 
