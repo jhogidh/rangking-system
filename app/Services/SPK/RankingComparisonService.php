@@ -70,6 +70,107 @@ class RankingComparisonService
         return $result;
     }
 
+    public function getAccuracySummaryByCategory(Collection $rankings): array
+{
+    $data = $this->calculateAccuracyByScope($rankings);
+    $result = [];
+
+    foreach (self::CATEGORY_LABELS as $key => $label) {
+        $kes = collect($data['keseluruhan'])->firstWhere('kategori_key', $key);
+        $top = collect($data['top_3'])->firstWhere('kategori_key', $key);
+
+        $result[$key] = [
+            'label' => $label,
+            'jumlah_siswa' => $kes['jumlah_manual'] ?? 0,
+
+            'avg_wp_keseluruhan' => $kes['akurasi_wp'] ?? 0,
+            'avg_wp_top3' => $top['akurasi_wp'] ?? 0,
+
+            'avg_borda_keseluruhan' => $kes['akurasi_borda'] ?? 0,
+            'avg_borda_top3' => $top['akurasi_borda'] ?? 0,
+
+            'wp_sesuai' => $kes['wp_sesuai'] ?? 0,
+            'wp_tidak_sesuai' => $kes['wp_tidak_sesuai'] ?? 0,
+
+            'borda_sesuai' => $kes['borda_sesuai'] ?? 0,
+            'borda_tidak_sesuai' => $kes['borda_tidak_sesuai'] ?? 0,
+        ];
+    }
+
+    return $result;
+}
+
+public function getAccuracyTablesByCategory(Collection $rankings): array
+{
+    $grouped = $rankings->groupBy(function ($item) {
+        return $item->dataSiswaKelas->id_kelas;
+    });
+
+    $result = [
+        'keseluruhan' => [],
+        'top_3' => []
+    ];
+
+    foreach (self::CATEGORY_LABELS as $categoryKey => $label) {
+
+        $rowsKes = [];
+        $rowsTop = [];
+
+        foreach ($grouped as $kelasId => $items) {
+
+            $kelas = optional($items->first()->dataSiswaKelas->kelas);
+            $namaKelas = trim(($kelas->nama ?? '') . ' ' . ($kelas->sub ?? ''));
+
+            $filtered = $items->filter(function ($row) use ($categoryKey) {
+                return $this->normalizeCategory($row->kategori) == $categoryKey;
+            });
+
+            $acc = $this->calculateAccuracyByScope($filtered);
+
+            $kes = collect($acc['keseluruhan'])->firstWhere('kategori_key', $categoryKey);
+            $top = collect($acc['top_3'])->firstWhere('kategori_key', $categoryKey);
+
+            if ($kes) {
+                $rowsKes[] = [
+                    'dataset_label' => $namaKelas,
+                    'wp_sesuai' => $kes['wp_sesuai'],
+                    'wp_tidak_sesuai' => $kes['wp_tidak_sesuai'],
+                    'akurasi_wp' => $kes['akurasi_wp'],
+                    'borda_sesuai' => $kes['borda_sesuai'],
+                    'borda_tidak_sesuai' => $kes['borda_tidak_sesuai'],
+                    'akurasi_borda' => $kes['akurasi_borda'],
+                    'jumlah_manual' => $kes['jumlah_manual'],
+                ];
+            }
+
+            if ($top) {
+                $rowsTop[] = [
+                    'dataset_label' => $namaKelas,
+                    'wp_sesuai' => $top['wp_sesuai'],
+                    'wp_tidak_sesuai' => $top['wp_tidak_sesuai'],
+                    'akurasi_wp' => $top['akurasi_wp'],
+                    'borda_sesuai' => $top['borda_sesuai'],
+                    'borda_tidak_sesuai' => $top['borda_tidak_sesuai'],
+                    'akurasi_borda' => $top['akurasi_borda'],
+                    'jumlah_manual' => $top['jumlah_manual'],
+                ];
+            }
+        }
+
+        $result['keseluruhan'][$categoryKey] = [
+            'label' => $label,
+            'rows' => $rowsKes
+        ];
+
+        $result['top_3'][$categoryKey] = [
+            'label' => $label,
+            'rows' => $rowsTop
+        ];
+    }
+
+    return $result;
+}
+
     private function collectMethodRanksByCategory(Collection $rankings): array
     {
         $result = [];

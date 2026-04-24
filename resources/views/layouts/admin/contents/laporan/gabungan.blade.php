@@ -13,7 +13,8 @@
                             <div class="card bg-success text-white mb-0">
                                 <div class="card-body">
                                     <h4 class="card-title text-white">Ringkasan Akurasi WP</h4>
-                                    <small class="d-block mb-3">Akurasi All / Top 3, jumlah siswa, sesuai, tidak sesuai per kategori.</small>
+                                    <small class="d-block mb-3">Akurasi All / Top 3, jumlah siswa, sesuai, tidak sesuai per
+                                        kategori.</small>
 
                                     @forelse($accuracySummaryByCategory as $summary)
                                         <div class="{{ !$loop->last ? 'pb-3 mb-3 border-bottom border-light' : '' }}">
@@ -41,7 +42,8 @@
                             <div class="card bg-warning text-white mb-0">
                                 <div class="card-body">
                                     <h4 class="card-title text-white">Ringkasan Akurasi Borda</h4>
-                                    <small class="d-block mb-3">Akurasi All / Top 3, jumlah siswa, sesuai, tidak sesuai per kategori.</small>
+                                    <small class="d-block mb-3">Akurasi All / Top 3, jumlah siswa, sesuai, tidak sesuai per
+                                        kategori.</small>
 
                                     @forelse($accuracySummaryByCategory as $summary)
                                         <div class="{{ !$loop->last ? 'pb-3 mb-3 border-bottom border-light' : '' }}">
@@ -121,6 +123,39 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
+
+                    <h4 class="card-title">Grafik Akurasi (WP vs Borda)</h4>
+                    <h5 id="judulChart">Akademik</h5>
+
+                    <!-- Slide 1 -->
+                    <div id="chart1">
+                        <canvas id="chartAkademik"></canvas>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div id="chart2" class="d-none">
+                        <canvas id="chartNonAkademik"></canvas>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div id="chart3" class="d-none">
+                        <canvas id="chartSemua"></canvas>
+                    </div>
+
+                    <!-- Tombol -->
+                    <div class="mt-3 text-center">
+                        <button onclick="prevChart()" class="btn btn-secondary">Prev</button>
+                        <button onclick="nextChart()" class="btn btn-primary">Next</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-12 grid-margin stretch-card">
+            <div class="card">
+                <div class="card-body">
                     <h4 class="card-title">Grafik Tren Waktu Proses Perhitungan (WP vs Borda)</h4>
                     <p class="card-description">Perbandingan waktu proses perhitungan (ms) di setiap dataset.</p>
                     <canvas id="waktuChart" height="100"></canvas>
@@ -190,16 +225,24 @@
                                         </thead>
                                         <tbody>
                                             @php
-                                                $rowsKeseluruhan = $accuracyTablesByCategory['keseluruhan'][$categoryKey]['rows'] ?? [];
+                                                $rowsKeseluruhan =
+                                                    $accuracyTablesByCategory['keseluruhan'][$categoryKey]['rows'] ??
+                                                    [];
                                             @endphp
                                             @forelse($rowsKeseluruhan as $row)
                                                 <tr>
                                                     <td class="text-center">{{ $loop->iteration }}</td>
                                                     <td>{{ $row['dataset_label'] }}</td>
-                                                    <td class="text-center">{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
-                                                    <td class="text-center">{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}</td>
-                                                    <td class="text-center">{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
-                                                    <td class="text-center">{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}</td>
+                                                    <td class="text-center">
+                                                        {{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
+                                                    <td class="text-center">
+                                                        {{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
+                                                    <td class="text-center">
+                                                        {{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}
+                                                    </td>
                                                     <td class="text-center">{{ $row['jumlah_manual'] }}</td>
                                                 </tr>
                                             @empty
@@ -229,16 +272,23 @@
                                         </thead>
                                         <tbody>
                                             @php
-                                                $rowsTop3 = $accuracyTablesByCategory['top_3'][$categoryKey]['rows'] ?? [];
+                                                $rowsTop3 =
+                                                    $accuracyTablesByCategory['top_3'][$categoryKey]['rows'] ?? [];
                                             @endphp
                                             @forelse($rowsTop3 as $row)
                                                 <tr>
                                                     <td class="text-center">{{ $loop->iteration }}</td>
                                                     <td>{{ $row['dataset_label'] }}</td>
-                                                    <td class="text-center">{{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
-                                                    <td class="text-center">{{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}</td>
-                                                    <td class="text-center">{{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
-                                                    <td class="text-center">{{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}</td>
+                                                    <td class="text-center">
+                                                        {{ $row['wp_sesuai'] }}/{{ $row['wp_tidak_sesuai'] }}</td>
+                                                    <td class="text-center">
+                                                        {{ is_null($row['akurasi_wp']) ? '-' : number_format($row['akurasi_wp'], 2) . '%' }}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        {{ $row['borda_sesuai'] }}/{{ $row['borda_tidak_sesuai'] }}</td>
+                                                    <td class="text-center">
+                                                        {{ is_null($row['akurasi_borda']) ? '-' : number_format($row['akurasi_borda'], 2) . '%' }}
+                                                    </td>
                                                     <td class="text-center">{{ $row['jumlah_manual'] }}</td>
                                                 </tr>
                                             @empty
@@ -258,7 +308,7 @@
     </div>
 
     <script>
-        window.addEventListener('load', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             var canvas = document.getElementById('waktuChart');
             if (!canvas || typeof Chart === 'undefined') {
                 return;
@@ -305,28 +355,26 @@
                         intersect: false
                     },
                     scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero: true
-                            },
-                            scaleLabel: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
                                 display: true,
-                                labelString: 'Waktu (ms)'
+                                text: 'Waktu (ms)'
                             }
-                        }],
-                        xAxes: [{
+                        },
+                        x: {
                             ticks: {
-                                autoSkip: false,
                                 maxRotation: 90,
                                 minRotation: 45
                             }
-                        }]
+                        }
                     },
                     tooltips: {
                         callbacks: {
                             label: function(tooltipItem, data) {
                                 var value = Number(tooltipItem.yLabel || 0).toFixed(2);
-                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + value + ' ms';
+                                return data.datasets[tooltipItem.datasetIndex].label + ': ' + value +
+                                    ' ms';
                             }
                         }
                     },
@@ -335,6 +383,76 @@
                     }
                 }
             });
+
+            // =====================
+            // CHART AKADEMIK
+            // =====================
+            var ctxAkademik = document.getElementById('chartAkademik');
+            if (ctxAkademik) {
+                new Chart(ctxAkademik.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: {!! json_encode($labels ?? []) !!},
+                        datasets: [{
+                                label: 'WP Keseluruhan',
+                                data: {!! json_encode($wpAkademikKeseluruhan ?? []) !!}
+                            },
+                            {
+                                label: 'WP Top 3',
+                                data: {!! json_encode($wpAkademikTop3 ?? []) !!}
+                            },
+                            {
+                                label: 'Borda Keseluruhan',
+                                data: {!! json_encode($bordaAkademikKeseluruhan ?? []) !!}
+                            },
+                            {
+                                label: 'Borda Top 3',
+                                data: {!! json_encode($bordaAkademikTop3 ?? []) !!}
+                            }
+                        ]
+                    }
+                });
+            }
+
+            // =====================
+// CHART NON AKADEMIK
+// =====================
+var ctxNon = document.getElementById('chartNonAkademik');
+if (ctxNon) {
+    new Chart(ctxNon.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($labelsNon ?? []) !!},
+            datasets: [
+                { label: 'WP Keseluruhan', data: {!! json_encode($wpNonKeseluruhan ?? []) !!} },
+                { label: 'WP Top 3', data: {!! json_encode($wpNonTop3 ?? []) !!} },
+                { label: 'Borda Keseluruhan', data: {!! json_encode($bordaNonKeseluruhan ?? []) !!} },
+                { label: 'Borda Top 3', data: {!! json_encode($bordaNonTop3 ?? []) !!} }
+            ]
+        }
+    });
+}
+
+// =====================
+// CHART SEMUA
+// =====================
+var ctxSemua = document.getElementById('chartSemua');
+if (ctxSemua) {
+    new Chart(ctxSemua.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($labelsSemua ?? []) !!},
+            datasets: [
+                { label: 'WP Keseluruhan', data: {!! json_encode($wpSemuaKeseluruhan ?? []) !!} },
+                { label: 'WP Top 3', data: {!! json_encode($wpSemuaTop3 ?? []) !!} },
+                { label: 'Borda Keseluruhan', data: {!! json_encode($bordaSemuaKeseluruhan ?? []) !!} },
+                { label: 'Borda Top 3', data: {!! json_encode($bordaSemuaTop3 ?? []) !!} }
+            ]
+        }
+    });
+}
+
         });
+        
     </script>
 @endsection
